@@ -15,19 +15,26 @@ import { AuthHelper } from './utils/AuthHelper';
 
 const Stack = createNativeStackNavigator();
 export default function App() {
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+ 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkLoginStatus = async () => {
+
+    async function checkLoginStatus() {
+      
       const token = await AuthHelper.getAccessToken();
-      if (token && !AuthHelper.isTokenExpired()) {
+ 
+      if (token && !AuthHelper.isTokenExpired()) 
         setIsLoggedIn(true);
-      }
+      
       setIsLoading(false);
+
     };
 
     checkLoginStatus();
+    
   }, []);
 
   if (isLoading) {
@@ -36,16 +43,8 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "Login"}>
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Home" component={HomeScreen} />
-        <Stack.Screen name="User" component={UserScreen} />
-        <Stack.Screen name="CartScreen" component={CartScreen} />
-        <Stack.Screen name="ProductListScreen" component={ProductListScreen} />
-        <Stack.Screen name="OrderCreateScreen" component={OrderCreateScreen} />
-        <Stack.Screen name="OrderItemCreateScreen" component={OrderItemCreateScreen} />
-        <Stack.Screen name="UserManagementScreen" component={UserManagementScreen} />
+      <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "Home"}> {/* colocar a login como a inicial se não tiver logado */}
+              <Stack.Screen name="Home" component={HomeScreen} />
       </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
