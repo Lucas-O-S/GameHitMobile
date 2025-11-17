@@ -1,11 +1,11 @@
-import { UsuarioService } from "../Service/Usuario.Service";
-import UsuarioModel from "../Models/UsuarioModel";
+import { UserService } from "../Service/User.Service";
+import UserModel from "../Models/UserModel";
 
-export default class UsuarioController {
+export default class UserController {
 
-    static async login(usuarioModel) {
+    static async login(UserModel) {
         try {
-            const result = await UsuarioService.login(usuarioModel);
+            const result = await UserService.login(UserModel);
             return result;
         } catch (error) {
             console.log("Erro ao fazer login:", error.message);
@@ -13,9 +13,9 @@ export default class UsuarioController {
         }
     }
 
-    static async createUsuario(usuarioModel) {
+    static async createUser(UserModel) {
         try {
-            const result = await UsuarioService.create(usuarioModel);
+            const result = await UserService.create(UserModel);
             return result;
         } catch (error) {
             console.log("Erro ao criar usuário:", error.message);
@@ -23,31 +23,31 @@ export default class UsuarioController {
         }
     }
 
-    static async findAllUsuarios() {
+    static async findAllUsers() {
         try {
-            return await UsuarioService.findAll();
+            return await UserService.findAll();
         } catch (error) {
             console.log("Erro ao buscar usuários:", error.message);
             throw new Error(error.message);
         }
     }
 
-    static async findOneUsuario(id) {
+    static async findOneUser(id) {
         try {
             if (!id || isNaN(id)) {
                 throw new Error("ID do usuário inválido");
             }
 
-            return await UsuarioService.findOne(id);
+            return await UserService.findOne(id);
         } catch (error) {
             console.log("Erro ao buscar usuário:", error.message);
             throw new Error(error.message);
         }
     }
 
-    static async updateUsuario(usuarioModel, id) {
+    static async updateUser(UserModel, id) {
         try {
-            const result = await UsuarioService.update(usuarioModel, id);
+            const result = await UserService.update(UserModel, id);
             return result;
         } catch (error) {
             console.log("Erro ao atualizar usuário:", error.message);
@@ -55,13 +55,13 @@ export default class UsuarioController {
         }
     }
 
-    static async deleteUsuario(id) {
+    static async deleteUser(id) {
         try {
             if (!id || isNaN(id)) {
                 throw new Error("ID do usuário inválido");
             }
 
-            const result = await UsuarioService.delete(id);
+            const result = await UserService.delete(id);
             return result;
         } catch (error) {
             console.log("Erro ao deletar usuário:", error.message);
@@ -71,7 +71,7 @@ export default class UsuarioController {
 
     static async retrieveUser() {
         try {
-            const result = await UsuarioService.retrieveUser();
+            const result = await UserService.retrieveUser();
             return result;
         } catch (error) {
             console.log("Erro ao recuperar usuário:", error.message);

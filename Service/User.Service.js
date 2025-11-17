@@ -1,19 +1,19 @@
 import { ExecuteHttpRequest } from "../utils/ExecuteHttpRequest";
 import { authHeader, jsonHeader } from "../utils/HeaderHelper";
 import { AuthHelper } from "../utils/AuthHelper";
-import UsuarioModel from "../Models/UsuarioModel";
-import { UsuarioWrapper } from "../Wrappers/UsuarioWrapper";
+import UserModel from "../Models/UserModel";
+import { UserWrapper } from "../Wrappers/UserWrapper";
 
-export class UsuarioService {
+export class UserService {
 
-    static async login(usuarioModel) {
+    static async login(userModel) {
         console.log("Entrou em login");
 
         const headers = {
             ...jsonHeader
         };
 
-        const body = UsuarioWrapper(usuarioModel);
+        const body = UserWrapper(userModel);
 
         const result = await ExecuteHttpRequest.callout({
             url: "/auth/login",
@@ -35,7 +35,7 @@ export class UsuarioService {
         return result.data;
     }
 
-    static async create(usuarioModel) {
+    static async create(userModel) {
         console.log("Entrou em create");
 
         const headers = {
@@ -43,12 +43,12 @@ export class UsuarioService {
         };
 
         const body = {
-            name: usuarioModel.name,
-            password: usuarioModel.password
+            name: userModel.name,
+            password: userModel.password
         };
 
         const result = await ExecuteHttpRequest.callout({
-            url: "/usuario",
+            url: "/user",
             method: "POST",
             body: body,
             headers: headers
@@ -72,18 +72,18 @@ export class UsuarioService {
         };
 
         const result = await ExecuteHttpRequest.callout({
-            url: "/usuario",
+            url: "/user",
             method: "GET",
             headers: headers
         });
 
         console.log(JSON.stringify(result));
 
-        let usuariosList = [];
+        let usersList = [];
 
         if (result.data && result.data.data) {
             result.data.data.forEach((dataUnit) => {
-                usuariosList.push(new UsuarioModel({
+                usersList.push(new UserModel({
                     id: dataUnit.id,
                     name: dataUnit.name,
                     password: ""
@@ -91,13 +91,13 @@ export class UsuarioService {
             });
         }
 
-        console.log(usuariosList);
+        console.log(usersList);
 
         if (result.data.status !== 200) {
             throw new Error(result.data.message);
         }
 
-        return usuariosList;
+        return usersList;
     }
 
     static async findOne(id) {
@@ -108,7 +108,7 @@ export class UsuarioService {
         };
 
         const result = await ExecuteHttpRequest.callout({
-            url: "/usuario/" + id,
+            url: "/user/" + id,
             method: "GET",
             headers: headers
         });
@@ -121,14 +121,14 @@ export class UsuarioService {
 
         const dataUnit = result.data.data;
 
-        return new UsuarioModel({
+        return new UserModel({
             id: dataUnit.id,
             name: dataUnit.name,
             password: ""
         });
     }
 
-    static async update(usuarioModel, id) {
+    static async update(userModel, id) {
         console.log("Entrou em update");
 
         const headers = {
@@ -137,12 +137,12 @@ export class UsuarioService {
         };
 
         const body = {
-            name: usuarioModel.name,
-            password: usuarioModel.password
+            name: userModel.name,
+            password: userModel.password
         };
 
         const result = await ExecuteHttpRequest.callout({
-            url: "/usuario/" + id,
+            url: "/user/" + id,
             method: "PUT",
             body: body,
             headers: headers
@@ -166,7 +166,7 @@ export class UsuarioService {
         };
 
         const result = await ExecuteHttpRequest.callout({
-            url: "/usuario/" + id,
+            url: "/user/" + id,
             method: "DELETE",
             headers: headers
         });

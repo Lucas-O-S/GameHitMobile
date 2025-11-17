@@ -1,6 +1,6 @@
 import StandardModel from "./StandardModel";
 
-export default class UsuarioModel extends StandardModel {
+export default class UserModel extends StandardModel {
 
     #name;
     #password;
