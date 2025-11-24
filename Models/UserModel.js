@@ -2,34 +2,37 @@ import StandardModel from "./StandardModel";
 
 export default class UserModel extends StandardModel {
 
-    #name;
+    #username;
+    #email;
     #password;
+    #userImage;
 
-    constructor({id = null, name = "", password = ""}) {
+    constructor({id = null, username = "", email = "", password = "", userImage = null}) {
         super(id);
-        this.#name = name;
+        this.#username = username;
+        this.#email = email;
         this.#password = password;
+        this.#userImage = userImage;
     }
 
-    get name() {
-        return this.#name;
+    get username() { return this.#username; }
+    set username(value) {
+        if (!value || value.length < 1) throw new Error("Nome de usuário vazio");
+        this.#username = value;
     }
 
-    get password() {
-        return this.#password;
+    get email() { return this.#email; }
+    set email(value) {
+        if (!value || !value.includes('@')) throw new Error("Email inválido");
+        this.#email = value;
     }
 
-    set name(value) {
-        if (!value || value.length < 1) {
-            throw new Error("Nome está vazio");
-        }
-        this.#name = value;
-    }
-
+    get password() { return this.#password; }
     set password(value) {
-        if (!value || value.length < 1) {
-            throw new Error("Senha está vazia");
-        }
+        if (!value || value.length < 2) throw new Error("Senha muito curta");
         this.#password = value;
     }
+
+    get userImage() { return this.#userImage; }
+    set userImage(value) { this.#userImage = value; }
 }

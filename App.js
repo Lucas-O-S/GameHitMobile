@@ -1,52 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import LoginScreen from './Screens/LoginScreen';
-import HomeScreen from './Screens/HomeScreen';
-import RegisterScreen from './Screens/RegisterScreen';
-import UserScreen from './Screens/UserScreen';
-import CartScreen from './Screens/CartScreen';
-import ProductListScreen from './Screens/ProductListScreen';
-import OrderCreateScreen from './Screens/OrderCreateScreen';
-import OrderItemCreateScreen from './Screens/OrderItemCreateScreen';
-import UserManagementScreen from './Screens/UserManagementScreen';
-import { AuthHelper } from './utils/AuthHelper';
+import { ActivityIndicator, View } from 'react-native';
 
-const Stack = createNativeStackNavigator();
-export default function App() {
+import { AuthProvider, AuthContext } from './utils/AuthContext';
+import AuthNavigator from './Navigation/AuthNavigator';
+import AdminNavigator from './Navigation/AdminNavigator';
+import UserNavigator from './Navigation/UserNavigator';
+import { Colors } from './Styles/Theme';
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
- 
-  const [isLoading, setIsLoading] = useState(true);
+function Routes() {
+  const { signed, user, loading } = useContext(AuthContext);
 
-  useEffect(() => {
-
-    async function checkLoginStatus() {
-      
-      const token = await AuthHelper.getAccessToken();
- 
-      if (token && !AuthHelper.isTokenExpired()) 
-        setIsLoggedIn(true);
-      
-      setIsLoading(false);
-
-    };
-
-    checkLoginStatus();
-    
-  }, []);
-
-  if (isLoading) {
-    return null; 
+  if (loading) {
+    return (
+      <View style={{flex:1, backgroundColor: Colors.background, justifyContent:'center', alignItems:'center'}}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
+    );
   }
 
+  if (!signed) return <AuthNavigator />;
+  
+  // Role 1 = Admin, Role 2 = User
+  return user?.roleId === 1 ? <AdminNavigator /> : <UserNavigator />;
+}
+
+export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "Home"}> {/* colocar a login como a inicial se não tiver logado */}
-              <Stack.Screen name="Home" component={HomeScreen} />
-      </Stack.Navigator>
-      <StatusBar style="auto" />
+      <AuthProvider>
+        <StatusBar style="light" backgroundColor={Colors.background} />
+        <Routes />
+      </AuthProvider>
     </NavigationContainer>
   );
 }

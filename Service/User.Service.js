@@ -1,6 +1,7 @@
 import { ExecuteHttpRequest } from "../utils/ExecuteHttpRequest";
-import { authHeader, jsonHeader } from "../utils/HeaderHelper";
+import { authHeader, jsonHeader, multipartHeader } from "../utils/HeaderHelper";
 import { AuthHelper } from "../utils/AuthHelper";
+import ImageHelper from "../utils/ImageHelper";
 import UserModel from "../Models/UserModel";
 import { UserWrapper } from "../Wrappers/UserWrapper";
 
@@ -13,7 +14,10 @@ export class UserService {
             ...jsonHeader
         };
 
-        const body = UserWrapper(userModel);
+        const body = {
+            email: email,
+            password: password
+        };
 
         const result = await ExecuteHttpRequest.callout({
             url: "/auth/login",
@@ -21,16 +25,24 @@ export class UserService {
             body: body,
             headers: headers
         });
-
-        console.log(JSON.stringify(result));
         
-        if (result.data.status !== 200) {
-            throw new Error(result.data.message);
+        if (result.data.statusCode === 400) {
+            const msg = Array.isArray(result.data.message) 
+                ? result.data.message.join(", ") 
+                : result.data.message;
+            throw new Error(msg);
         }
 
-        const accessToken = result.data.dataUnit.access_token;
-        
-        AuthHelper.setAccessToken(accessToken);
+        if (result.data.status !== 200 && result.status !== 200 && result.status !== 201) {
+            throw new Error(result.data.message || "Erro ao fazer login");
+        }
+
+        if (result.data.dataUnit && result.data.dataUnit.access_token) {
+            const accessToken = result.data.dataUnit.access_token;
+            await AuthHelper.setAccessToken(accessToken);
+        } else {
+            throw new Error("Token não retornado pelo servidor");
+        }
 
         return result.data;
     }
@@ -38,30 +50,35 @@ export class UserService {
     static async create(userModel) {
         console.log("Entrou em create");
 
-        const headers = {
-            ...jsonHeader,
-        };
+        const headers = { ...multipartHeader };
 
-        const body = {
-            name: userModel.name,
-            password: userModel.password
-        };
+        const formData = new FormData();
+        formData.append('username', userModel.username);
+        formData.append('email', userModel.email);
+        formData.append('password', userModel.password);
+        formData.append('roleId', '2');
+
+        if (userModel.userImage) {
+            const file = ImageHelper.convertUriToFile(userModel.userImage);
+            formData.append('userImage', {
+                uri: file.uri,
+                name: file.name,
+                type: file.type
+            });
+        }
 
         const result = await ExecuteHttpRequest.callout({
-            url: "/user",
+            url: "/User",
             method: "POST",
-            body: body,
+            body: formData,
             headers: headers
         });
 
-        console.log(JSON.stringify(result));
-
-        const resultBody = result.data;
-        if (result.data.status !== 201) {
-            throw new Error(resultBody.message);
+        if (!result?.data || result.data.status !== 201) {
+            throw new Error(result?.data?.message || "Erro ao criar usuário");
         }
 
-        return result;
+        return result.data;
     }
 
     static async findAll() {
