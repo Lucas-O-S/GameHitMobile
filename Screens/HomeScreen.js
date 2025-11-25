@@ -1,20 +1,39 @@
-import React, { useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
-import { AuthContext } from "../utils/AuthContext";
+import { AuthHelper } from "../utils/AuthHelper";
 import { GlobalStyles, Colors } from "../Styles/Theme";
+import UserController from "../Controller/User.Controller";
+import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 export default function HomeScreen({ navigation }) {
-    const { signOut, user } = useContext(AuthContext);
+    const [userName, setUserName] = useState("Player");
 
-    function handleEditProfile() {
-        navigation.navigate("EditProfile", { userId: user?.id }); 
+    useEffect(() => {
+        async function getName() {
+            try {
+            } catch (e) { console.log(e)}
+        }
+        getName();
+    }, []);
+
+    async function handleSignOut() {
+        try {
+            await AuthHelper.clearAccessToken();
+
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+            });
+        } catch (error) {
+            console.log("Erro ao sair:", error);
+        }
     }
 
     return (
         <View style={GlobalStyles.container}>
         <View style={styles.header}>
-            <Text style={GlobalStyles.title}>Bem-vindo, {user?.name || "Player"}</Text>
+            <Text style={GlobalStyles.title}>Bem-vindo, {userName}</Text>
             <Text style={styles.subtitle}>O que vamos jogar hoje?</Text>
         </View>
 
@@ -29,14 +48,14 @@ export default function HomeScreen({ navigation }) {
 
             <TouchableOpacity
                 style={[styles.card, { backgroundColor: Colors.surface }]}
-                onPress={() => navigation.navigate("User")}
+                onPress={() => navigation.navigate("User", {userId: null})}
             >
             <Ionicons name="person" size={40} color={Colors.secondary} />
             <Text style={styles.cardText}>Meu Perfil</Text>
             </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
             <Text style={styles.logoutText}>Sair da Conta</Text>
         </TouchableOpacity>
         </View>

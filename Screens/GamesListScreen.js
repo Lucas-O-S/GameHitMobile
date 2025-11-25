@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext, useCallback } from "react";
+import React, { useState, useContext, useCallback } from "react";
 import { View, FlatList, Alert, Text } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -6,13 +6,11 @@ import LoadingOverlay from "../Components/LoadingOverlay";
 import IconButtonComponent from "../Components/IconButtonComponent";
 
 import GameController from "../Controller/Game.Controller";
-
 import { GlobalStyles, Colors } from "../Styles/Theme";
-import { AuthContext } from "../utils/AuthContext";
 import { ListItemComponent } from "../Components/ListItemComponent";
 
 export default function GamesListScreen({ navigation }) {
-    const { user } = useContext(AuthContext);
+
     const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(false);
 
@@ -81,19 +79,6 @@ export default function GamesListScreen({ navigation }) {
             </Text>
           }
         />
-
-
-        {user?.roleId === 1 && (
-            <View style={{ position: 'absolute', bottom: 20, right: 20 }}>
-              <IconButtonComponent 
-                  iconName="add" 
-                  size={30} 
-                  color="#FFF" 
-                  style={{ backgroundColor: Colors.primary, borderRadius: 30, width: 60, height: 60, elevation: 5 }}
-                  onPress={() => navigation.navigate("AddGame")}
-              />
-            </View>
-        )}
       </View>
     );
 }

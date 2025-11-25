@@ -3,12 +3,10 @@ import { View, TouchableOpacity, Text, Alert } from "react-native";
 import InputTextComponent from "../Components/InputTextComponent";
 import ButtonComponent from "../Components/ButtonComponent";
 import LoadingOverlay from "../Components/LoadingOverlay";
-import { AuthContext } from "../utils/AuthContext";
 import { GlobalStyles, Colors } from "../Styles/Theme";
 import UserController from "../Controller/User.Controller";
 
 export default function LoginScreen({ navigation }) {
-    const { signIn } = useContext(AuthContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
@@ -20,7 +18,10 @@ export default function LoginScreen({ navigation }) {
         try {
             await UserController.login(email, password);
 
-            navigation.navigate('Home');
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Home' }],
+            });
         } catch (error) {
             Alert.alert("Erro", error.message);
         } finally {

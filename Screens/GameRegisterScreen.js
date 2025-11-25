@@ -20,16 +20,10 @@ export default function GameRegisterScreen({ route, navigation }) {
 
     useFocusEffect(
         useCallback(() => {
-            let timeout;
-
             async function loadData() {
                 await load();
-                timeout = setTimeout(loadData, 60000);
             }
-
             loadData();
-
-            return () => clearTimeout(timeout);
         }, [])
     );
 
@@ -42,12 +36,7 @@ export default function GameRegisterScreen({ route, navigation }) {
 
             const result = await GameStatusController.findAll();
 
-            const formatted = result.map(s => ({
-                label: s.name,
-                value: s.id
-            }));
-
-            setGameStatusList(formatted);
+            setGameStatusList(result);
 
         } catch {
             Alert.alert("Erro", "Falha ao carregar dados.");
@@ -55,6 +44,31 @@ export default function GameRegisterScreen({ route, navigation }) {
         }
 
         finally {
+            setLoading(false);
+        }
+    }
+
+    async function handleSave() {
+        if (!gameStatusId) {
+            Alert.alert("Erro", "Selecione um status.");
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            await RegisterController.updateGame({
+                userId,
+                gameId: game.id,
+                gameStatusId
+            });
+
+            Alert.alert("Sucesso", "Registro criado!");
+            navigation.goBack();
+
+        } catch (error) {
+            Alert.alert("Erro", "Falha ao criar registro.");
+        } finally {
             setLoading(false);
         }
     }
@@ -90,6 +104,12 @@ export default function GameRegisterScreen({ route, navigation }) {
                 <Text style={{ marginTop: 10, color: Colors.textSecondary }}>
                     Selecionado: {gameStatusId || "Nenhum"}
                 </Text>
+            </View>
+
+            <View style={{ marginTop: 20 }}>
+                <ButtonComponent
+                    label="Salvar Registro"
+                    pressFunction={handleSave} />
             </View>
         </ScrollView>
     );

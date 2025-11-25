@@ -6,10 +6,15 @@ import ImageHelper from "../utils/ImageHelper";
 
 export class GameStatusService {
     static async findAll() {
+
+        const headers = {
+            ...(await authHeader()),
+        };
+        
         const result = await ExecuteHttpRequest.callout({
             url: "/GameStatus",
             method: "GET",
-            headers: authHeader,
+            headers: headers,
         });
 
         let GenreList = [];

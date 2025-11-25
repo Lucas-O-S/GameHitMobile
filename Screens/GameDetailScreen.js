@@ -4,7 +4,6 @@ import LoadingOverlay from "../Components/LoadingOverlay";
 import ButtonComponent from "../Components/ButtonComponent";
 import GameController from "../Controller/Game.Controller";
 import { GlobalStyles, Colors } from "../Styles/Theme";
-import { AuthContext } from "../utils/AuthContext";
 import { convertStandardDateToDmy } from "../utils/DateConverter";
 import { useFocusEffect } from "@react-navigation/native";
 
@@ -18,19 +17,10 @@ export default function GameDetailScreen({ route, navigation }) {
 
     useFocusEffect(
         useCallback(() => {
-            let timeout;
-
             async function loadData() {
-
                 await load();
-
-                timeout = setTimeout(loadData, 60000);
             }
-
             loadData();
-
-            return () => clearTimeout(timeout);
-
         }, [])
     );
 
@@ -46,8 +36,6 @@ export default function GameDetailScreen({ route, navigation }) {
             setLoading(false);
         }
     }
-
-
 
     if (loading || !game) return <LoadingOverlay visible={true} />;
 
@@ -84,9 +72,8 @@ export default function GameDetailScreen({ route, navigation }) {
 
             <ButtonComponent
                 label={"Criar Registro deste Jogo"}
-                pressFunction={() => navigation.navigate("GameRegisterScreen")}
+                pressFunction={() => navigation.navigate("GameRegisterScreen", { game })}
             />
-
 
         </ScrollView>
     );
