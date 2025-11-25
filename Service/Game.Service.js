@@ -52,9 +52,14 @@ export class GameService {
 
     static async findOne(id) {
 
+        console.log("Chegou no findOne da service")
+
         const headers = {
             ...(await authHeader()),
         };
+
+        console.log(id)
+        
 
         const result = await ExecuteHttpRequest.callout({
         url: `/Game/${id}`,
@@ -69,19 +74,19 @@ export class GameService {
 
         let imagem64 = "";
         
-        if (data.data.dataUnit.cover) {
-            imagem64 = ImageHelper.convertByteToBase64(dataUnit.cover);
+        if (result.data.dataUnit.cover) {
+            imagem64 = ImageHelper.convertByteToBase64(result.data.dataUnit.cover);
         }
 
 
         return new GameModel({
-            id: result.data.id,
-            name : result.data.name,
-            firstReleaseDate : result.data.firstReleaseDate,
+            id: result.data.dataUnit.id,
+            name : result.data.dataUnit.name,
+            firstReleaseDate : result.data.dataUnit.firstReleaseDate,
             cover : imagem64,
             genre : new GenreModel({
-                id :  result.data.genre.id,
-                name :  result.data.genre.name
+                id :  result.data.dataUnit.genre.id,
+                name :  result.data.dataUnit.genre.name
             })
         })
     }

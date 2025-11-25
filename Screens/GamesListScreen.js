@@ -19,18 +19,15 @@ export default function GamesListScreen({ navigation }) {
 
     useFocusEffect(
         useCallback(() => {
-            let timeout;
 
             async function loadData() {
 
                 await loadGames();
 
-                timeout = setTimeout(loadData, 60000);
             }
 
             loadData();
 
-            return () => clearTimeout(timeout);
 
         }, [])
     );
@@ -59,7 +56,7 @@ export default function GamesListScreen({ navigation }) {
         contentContainerStyle={{ paddingBottom: 80 }}
         renderItem={({ item, index }) => (
           <ListItemComponent
-            onPress={() => navigation.navigate("GameDetail", { id: item.id })}
+            onPress={() => navigation.navigate("GameDetailScreen", { id: item.id })}
             content={() => (
               <View>
                 <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
