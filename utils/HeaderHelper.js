@@ -12,7 +12,6 @@ export const authHeader = async () => {
 
   const accessToken = await AuthHelper.getAccessToken();
 
-  console.log("aaaaaaaaaa ", accessToken);
   if (accessToken) {
     return {
 

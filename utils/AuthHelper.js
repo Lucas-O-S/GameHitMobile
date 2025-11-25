@@ -4,10 +4,31 @@ import { decode } from "base-64"; global.atob = decode;
 export class AuthHelper {
   
   static #accessToken = null;
+  static async retrieveToken() {
+    try {
+      const storedToken = await AsyncStorage.getItem('accessToken');
+      console.log("AcessToken salvo", storedToken);
 
-  static async retrieveToken(){
-    this.#accessToken = await AsyncStorage.getItem('accessToken');
-    console.log("AcessToken salvo",this.#accessToken)
+      if (!storedToken || storedToken === "null" || storedToken === "undefined") {
+        await this.clearAccessToken(); 
+        return null;
+      }
+
+      this.#accessToken = storedToken;
+
+      if (this.isTokenExpired()) {
+        console.log("Token expirado! Limpando...");
+        await this.clearAccessToken();  
+        return null;
+      }
+
+      return this.#accessToken;
+
+    } catch (error) {
+      console.log("Erro ao recuperar token:", error);
+      await this.clearAccessToken();  
+      return null;
+    }
   }
 
   static async setAccessToken(token) {
