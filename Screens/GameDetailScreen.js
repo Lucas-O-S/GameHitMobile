@@ -12,7 +12,6 @@ import { useFocusEffect } from "@react-navigation/native";
 export default function GameDetailScreen({ route, navigation }) {
     
     const { id } = route.params;
-    const { user } = useContext(AuthContext);
     const [game, setGame] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -52,7 +51,6 @@ export default function GameDetailScreen({ route, navigation }) {
 
     if (loading || !game) return <LoadingOverlay visible={true} />;
 
-    const isAdmin = user?.roleId === 1;
 
     return (
         <ScrollView contentContainerStyle={GlobalStyles.container}>
@@ -83,22 +81,6 @@ export default function GameDetailScreen({ route, navigation }) {
                 )}
             </View>
 
-            {/* Botões de Ação (Apenas Admin) */}
-            {isAdmin && (
-                <View>
-                    <ButtonComponent
-                        label="Editar Jogo"
-                        pressFunction={() => navigation.navigate("EditGame", { game })} // Passando objeto game
-                    />
-
-                    <TouchableOpacity
-                        style={{ marginTop: 15, padding: 15, backgroundColor: Colors.danger, borderRadius: 8, alignItems: 'center' }}
-                        onPress={deleteGame}
-                    >
-                        <Text style={{ color: '#fff', fontWeight: "bold" }}>Excluir Jogo</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
         </ScrollView>
     );
 }

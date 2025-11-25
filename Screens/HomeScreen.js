@@ -28,8 +28,8 @@ export default function HomeScreen({ navigation }) {
             </TouchableOpacity>
 
             <TouchableOpacity
-            style={[styles.card, { backgroundColor: Colors.surface }]}
-            onPress={() => navigation.navigate("User")}
+                style={[styles.card, { backgroundColor: Colors.surface }]}
+                onPress={() => navigation.navigate("User")}
             >
             <Ionicons name="person" size={40} color={Colors.secondary} />
             <Text style={styles.cardText}>Meu Perfil</Text>

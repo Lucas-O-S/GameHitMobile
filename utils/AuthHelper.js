@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { decode } from "base-64"; global.atob = decode;
+import { decode } from "base-64";import UserController from '../Controller/User.Controller';
+ global.atob = decode;
 
 export class AuthHelper {
   
@@ -133,7 +134,7 @@ export class AuthHelper {
     return Math.max(0, expirationTime - new Date());
   }
 
-  static getUserIdFromToken() {
+  static async getUserIdFromToken() {
     
     if (!this.#accessToken) {
     
@@ -143,10 +144,9 @@ export class AuthHelper {
 
     try {
     
-      const payload = JSON.parse(atob(this.#accessToken.split('.')[1]));
-    
-      return payload.sub;
-
+      const payload = await UserController.retrieveUser();
+      console.log("payload:", payload.id);
+      return payload.id;
     }
       catch (error) {
     
