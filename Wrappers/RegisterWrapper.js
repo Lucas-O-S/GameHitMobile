@@ -7,7 +7,7 @@ export const registerWrapper = (registerModel) => {
         completedDate : convertDmyToStandardDate(registerModel.completedDate),
         personalRating : registerModel.personalRating,
         userId : registerModel.userId,
-        gameId : registerModel.gameId,
-        gameStatusId : registerModel.gameStatusId,
+        gameId : registerModel.game.id,
+        gameStatusId : registerModel.gameStatus.id,
     }
 }
