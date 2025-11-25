@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { decode } from "base-64"; global.atob = decode;
 
 export class AuthHelper {
   
@@ -18,7 +19,7 @@ export class AuthHelper {
       this.#accessToken = await AsyncStorage.getItem('accessToken');
     
     }
-   
+  
     return this.#accessToken;
   }
 
@@ -121,11 +122,24 @@ export class AuthHelper {
 
     }
       catch (error) {
-     
+    
         console.log('Erro ao obter userId do token:', error);
       return null;
     
     }
 
+  }
+
+  static async getUserRole() {
+    const token = await this.getAccessToken();
+    if (!token) return null;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.roleId || payload.role || 2;
+    } catch (error) {
+      console.log('Erro ao decodificar role:', error);
+      return null;
+    }
   }
 }

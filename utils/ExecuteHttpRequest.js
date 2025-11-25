@@ -36,12 +36,15 @@ export class ExecuteHttpRequest{
 
         } 
         catch (error) {
-            const status = error.response?.status;
-            const data = error.response?.data;
+            const status = error.response?.status ?? 0;
+            const data = error.response?.data ?? {
+                status: 0,
+                message: error.message || "Erro de requisição"
+            };
 
             console.log("Erro na requisição:", status, data);
 
-            return error.response;
+            return { status, data };
         }
 
     }
