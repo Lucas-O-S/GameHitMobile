@@ -1,3 +1,4 @@
+import GenreModel from "./Genre.model";
 import StandardModel from "./StandardModel";
 
 export default class GameModel extends StandardModel {
@@ -7,7 +8,7 @@ export default class GameModel extends StandardModel {
     #cover;
     #genre;
 
-    constructor({ id = null, name = "", firstReleaseDate = "", genreId = null, cover = null, genre = null }) {
+    constructor({ id = null, name = "", firstReleaseDate = "", genreId = null, cover = null, genre = new GenreModel()}) {
         super(id);
         this.#name = name;
         this.#firstReleaseDate = firstReleaseDate;
