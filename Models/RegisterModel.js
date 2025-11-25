@@ -22,13 +22,13 @@ export default class RegisterModel extends StandardModel {
     }) {
         super(id);
 
-        this.review = review;
-        this.completedDate = completedDate;
-        this.startedDate = startedDate;
-        this.personalRating = personalRating;
-        this.userId = userId;
-        this.game = game;
-        this.gameStatus = gameStatus;
+        this.#review = review;
+        this.#completedDate = completedDate;
+        this.#startedDate = startedDate;
+        this.#personalRating = personalRating;
+        this.#userId = userId;
+        this.#game = game;
+        this.#gameStatus = gameStatus;
     }
 
     get review() { return this.#review; }
