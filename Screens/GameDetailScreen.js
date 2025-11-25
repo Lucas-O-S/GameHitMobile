@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import { View, Text, Alert, Image, ScrollView, TouchableOpacity } from "react-native";
 import LoadingOverlay from "../Components/LoadingOverlay";
 import ButtonComponent from "../Components/ButtonComponent";
@@ -6,14 +6,36 @@ import GameController from "../Controller/Game.Controller";
 import { GlobalStyles, Colors } from "../Styles/Theme";
 import { AuthContext } from "../utils/AuthContext";
 import { convertStandardDateToDmy } from "../utils/DateConverter";
+import { useFocusEffect } from "@react-navigation/native";
+
 
 export default function GameDetailScreen({ route, navigation }) {
+    
     const { id } = route.params;
-    const { user } = useContext(AuthContext);
     const [game, setGame] = useState(null);
     const [loading, setLoading] = useState(true);
 
+
+    useFocusEffect(
+        useCallback(() => {
+            let timeout;
+
+            async function loadData() {
+
+                await load();
+
+                timeout = setTimeout(loadData, 60000);
+            }
+
+            loadData();
+
+            return () => clearTimeout(timeout);
+
+        }, [])
+    );
+
     async function load() {
+        setLoading(true);
         try {
             const res = await GameController.findOneGame(id);
             setGame(res); 
@@ -25,37 +47,17 @@ export default function GameDetailScreen({ route, navigation }) {
         }
     }
 
-    async function deleteGame() {
-        Alert.alert("Confirmação", "Tem certeza que deseja apagar este jogo?", [
-            { text: "Cancelar" },
-            {
-                text: "Excluir",
-                style: "destructive",
-                onPress: async () => {
-                    try {
-                        await GameController.deleteGame(id);
-                        Alert.alert("Sucesso", "Jogo removido.");
-                        navigation.goBack();
-                    } catch (error) {
-                        Alert.alert("Erro", error.message);
-                    }
-                },
-            },
-        ]);
-    }
 
-    useEffect(() => { load() }, []);
 
     if (loading || !game) return <LoadingOverlay visible={true} />;
 
-    const isAdmin = user?.roleId === 1;
 
     return (
         <ScrollView contentContainerStyle={GlobalStyles.container}>
             {/* Imagem */}
             {game.cover ? (
                 <Image
-                    source={{ uri: `data:image/jpeg;base64,${game.cover}` }} 
+                    source={{ uri: game.cover }} 
                     style={{ width: "100%", height: 250, borderRadius: 12, marginBottom: 20 }}
                     resizeMode="cover"
                 />
@@ -77,24 +79,15 @@ export default function GameDetailScreen({ route, navigation }) {
                         <Text style={{ color: Colors.primary, fontSize: 16, fontWeight: 'bold' }}>{game.genre.name}</Text>
                     </>
                 )}
+
             </View>
 
-            {/* Botões de Ação (Apenas Admin) */}
-            {isAdmin && (
-                <View>
-                    <ButtonComponent
-                        label="Editar Jogo"
-                        pressFunction={() => navigation.navigate("EditGame", { game })} // Passando objeto game
-                    />
+            <ButtonComponent
+                label={"Criar Registro deste Jogo"}
+                pressFunction={() => navigation.navigate("GameRegisterScreen")}
+            />
 
-                    <TouchableOpacity
-                        style={{ marginTop: 15, padding: 15, backgroundColor: Colors.danger, borderRadius: 8, alignItems: 'center' }}
-                        onPress={deleteGame}
-                    >
-                        <Text style={{ color: '#fff', fontWeight: "bold" }}>Excluir Jogo</Text>
-                    </TouchableOpacity>
-                </View>
-            )}
+
         </ScrollView>
     );
 }

@@ -54,7 +54,7 @@ export class UserService {
 
         const formData = new FormData();
         formData.append('username', userModel.username);
-        formData.append('email', userModel.email);
+        formData.append('email', `${userModel.email}`);
         formData.append('password', userModel.password);
         formData.append('roleId', '2');
 
@@ -62,7 +62,7 @@ export class UserService {
             const file = ImageHelper.convertUriToFile(userModel.userImage);
             formData.append('userImage', {
                 uri: file.uri,
-                name: file.name,
+                username: file.username,
                 type: file.type
             });
         }
@@ -85,7 +85,7 @@ export class UserService {
         console.log("Entrou em findAll");
 
         const headers = {
-            ...authHeader
+            ...(await authHeader()),
         };
 
         const result = await ExecuteHttpRequest.callout({
@@ -100,9 +100,14 @@ export class UserService {
 
         if (result.data && result.data.data) {
             result.data.data.forEach((dataUnit) => {
+                
+                const image64 = dataUnit.userImage ? ImageHelper.convertByteToBase64(dataUnit.userImage) : "";
+
                 usersList.push(new UserModel({
                     id: dataUnit.id,
-                    name: dataUnit.name,
+                    username: dataUnit.username,
+                    email: dataUnit.email, 
+                    userImage: image64,
                     password: ""
                 }));
             });
@@ -121,7 +126,7 @@ export class UserService {
         console.log("Entrou em findOne");
 
         const headers = {
-            ...authHeader,
+            ...(await authHeader()),
         };
 
         const result = await ExecuteHttpRequest.callout({
@@ -136,50 +141,60 @@ export class UserService {
             throw new Error(result.data.message);
         }
 
-        const dataUnit = result.data.data;
+        const dataUnit = result.data.dataUnit;
+
+        const image64 = dataUnit.userImage ? ImageHelper.convertByteToBase64(dataUnit.userImage) : "";
 
         return new UserModel({
             id: dataUnit.id,
-            name: dataUnit.name,
-            password: ""
+            username: dataUnit.username,
+            email: dataUnit.email,
+            password: "",
+            userImage: image64
         });
     }
 
     static async update(userModel, id) {
-        console.log("Entrou em update");
+        const form = new FormData();
+
+
+        console.log('email:',userModel.email)
+
+        form.append("username", userModel.username);
+        form.append("email", `${userModel.email}`);
+        form.append("password", userModel.password);
+
+        if (userModel.imageFile) {
+            form.append("userImage", ImageHelper.convertBase64ToFile());
+        }
 
         const headers = {
-            ...jsonHeader,
-            ...authHeader
-        };
-
-        const body = {
-            name: userModel.name,
-            password: userModel.password
+            ...(await authHeader()),
+            ...multipartHeader
         };
 
         const result = await ExecuteHttpRequest.callout({
             url: "/user/" + id,
             method: "PUT",
-            body: body,
+            body: form,
             headers: headers
         });
 
-        console.log(JSON.stringify(result));
-
         const resultBody = result.data;
-        if (result.data.status !== 200) {
+
+        if (resultBody.status !== 200) {
             throw new Error(resultBody.message);
         }
 
         return result;
     }
 
+
     static async delete(id) {
         console.log("Entrou em delete");
 
         const headers = {
-            ...authHeader
+            ...(await authHeader()),
         };
 
         const result = await ExecuteHttpRequest.callout({
@@ -201,7 +216,7 @@ export class UserService {
         console.log("Entrou em retrieveUser");
 
         const headers = {
-            ...authHeader,
+            ...(await authHeader()),
             ...jsonHeader
         };
 

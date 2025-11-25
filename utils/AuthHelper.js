@@ -1,9 +1,36 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { decode } from "base-64"; global.atob = decode;
+import { decode } from "base-64";import UserController from '../Controller/User.Controller';
+ global.atob = decode;
 
 export class AuthHelper {
   
   static #accessToken = null;
+  static async retrieveToken() {
+    try {
+      const storedToken = await AsyncStorage.getItem('accessToken');
+      console.log("AcessToken salvo", storedToken);
+
+      if (!storedToken || storedToken === "null" || storedToken === "undefined") {
+        await this.clearAccessToken(); 
+        return null;
+      }
+
+      this.#accessToken = storedToken;
+
+      if (this.isTokenExpired()) {
+        console.log("Token expirado! Limpando...");
+        await this.clearAccessToken();  
+        return null;
+      }
+
+      return this.#accessToken;
+
+    } catch (error) {
+      console.log("Erro ao recuperar token:", error);
+      await this.clearAccessToken();  
+      return null;
+    }
+  }
 
   static async setAccessToken(token) {
     
@@ -14,7 +41,7 @@ export class AuthHelper {
   }
 
   static async getAccessToken() {
-    console.log("aaaaaaaaaa ", this.#accessToken);
+    console.log("access token ", this.#accessToken);
     if (!this.#accessToken) {
       
       this.#accessToken = await AsyncStorage.getItem('accessToken');
@@ -107,7 +134,7 @@ export class AuthHelper {
     return Math.max(0, expirationTime - new Date());
   }
 
-  static getUserIdFromToken() {
+  static async getUserIdFromToken() {
     
     if (!this.#accessToken) {
     
@@ -117,10 +144,9 @@ export class AuthHelper {
 
     try {
     
-      const payload = JSON.parse(atob(this.#accessToken.split('.')[1]));
-    
-      return payload.sub;
-
+      const payload = await UserController.retrieveUser();
+      console.log("payload:", payload.id);
+      return payload.id;
     }
       catch (error) {
     

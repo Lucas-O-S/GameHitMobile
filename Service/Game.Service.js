@@ -6,25 +6,28 @@ import ImageHelper from "../utils/ImageHelper";
 
 export class GameService {
     static async findAll() {
-        
+        console.log("Chegou em find all")
         const headers = {
-            ...authHeader
+            ...(await authHeader()),
         };
 
-        const result = ExecuteHttpRequest.callout({
-        url: "/Game?BuscaImagem=true",
-        method: "GET",
-        headers: headers,
+
+        const result = await ExecuteHttpRequest.callout({
+            url: "/Game",
+            method: "GET",
+            headers: headers,
+            param: { getImage: true },
         });
-               
-        if (result.data.status != 200) {
+        
+
+        if (result.status != 200) {
             throw new Error(result.data.message);
         }
 
         let gameList = [];
 
-        if (result.data && result.data.data) {
-            result.data.data.forEach((dataUnit) => {
+        if (result.data && result.data.dataUnit) {
+            result.data.dataUnit.forEach((dataUnit) => {
                 let imagem64 = "";
                 
                 if (dataUnit.cover) {
@@ -32,23 +35,36 @@ export class GameService {
                 }
 
                 gameList.push(new GameModel({
-                    name : result.data.name,
-                    firstReleaseDate : result.data.firstReleaseDate,
+                    id: dataUnit.id,
+                    name : dataUnit.name,
+                    firstReleaseDate : dataUnit.firstReleaseDate,
                     cover : imagem64,
                     genre : new GenreModel({
-                        id :  result.data.genre.id,
-                        name :  result.data.genre.name
+                        id :  dataUnit.genre.id,
+                        name :  dataUnit.genre.name
                     })
                 }))
             })
         }
+        console.log(gameList)
+        return gameList;
     }
 
     static async findOne(id) {
-        const result = ExecuteHttpRequest.callout({
+
+        console.log("Chegou no findOne da service")
+
+        const headers = {
+            ...(await authHeader()),
+        };
+
+        console.log(id)
+        
+
+        const result = await ExecuteHttpRequest.callout({
         url: `/Game/${id}`,
         method: "GET",
-        headers: authHeader,
+        headers: headers,
         });
 
         
@@ -58,24 +74,25 @@ export class GameService {
 
         let imagem64 = "";
         
-        if (data.data.dataUnit.cover) {
-            imagem64 = ImageHelper.convertByteToBase64(dataUnit.cover);
+        if (result.data.dataUnit.cover) {
+            imagem64 = ImageHelper.convertByteToBase64(result.data.dataUnit.cover);
         }
 
 
         return new GameModel({
-            name : result.data.name,
-            firstReleaseDate : result.data.firstReleaseDate,
+            id: result.data.dataUnit.id,
+            name : result.data.dataUnit.name,
+            firstReleaseDate : result.data.dataUnit.firstReleaseDate,
             cover : imagem64,
             genre : new GenreModel({
-                id :  result.data.genre.id,
-                name :  result.data.genre.name
+                id :  result.data.dataUnit.genre.id,
+                name :  result.data.dataUnit.genre.name
             })
         })
     }
 
     static async delete(id) {
-        return ExecuteHttpRequest.callout({
+        return await ExecuteHttpRequest.callout({
         url: `/Game/${id}`,
         method: "DELETE",
         headers: authHeader,
@@ -84,7 +101,7 @@ export class GameService {
 
     static async update(gameModel, imageUri) {
         const headers = { 
-            ...authHeader(),
+            ...(await authHeader()),
             ...multipartHeader
         };
 
@@ -131,7 +148,7 @@ export class GameService {
         });
         }
 
-        return ExecuteHttpRequest.callout({
+        return await ExecuteHttpRequest.callout({
         url: "/Game",
         method: "POST",
         body: form,

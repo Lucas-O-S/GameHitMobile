@@ -8,11 +8,10 @@ export const jsonHeader = {
   'Content-Type': 'application/json'
 };
 
-export const authHeader = () => {
+export const authHeader = async () => {
 
-  const accessToken = AuthHelper.getAccessToken();
+  const accessToken = await AuthHelper.getAccessToken();
 
-  console.log("aaaaaaaaaa ", accessToken);
   if (accessToken) {
     return {
 
