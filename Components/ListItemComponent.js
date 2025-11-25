@@ -12,7 +12,9 @@ export function ListItemComponent({
     editButtonLabel = "Editar",
     deleteButtonLabel = null,
     showEditButton = false,
-    showDeleteButton = false
+    showDeleteButton = false,
+    // when false, the parent is responsible for confirmation (no internal modal)
+    useInternalConfirmation = true,
 
   }) {
   const [alertVisible, setAlertVisible] = useState(false);
@@ -34,25 +36,35 @@ export function ListItemComponent({
           </TouchableOpacity>
         }
 
-        {showDeleteButton && deleteFunction &&
-          <TouchableOpacity style={styles.deleteButton} onPress={callDelete}>
-            {deleteButtonLabel &&
-              <Text style={styles.deleteButtonText}>{deleteButtonLabel}</Text>
-            }
-          </TouchableOpacity>
-        }
+        {showDeleteButton && deleteFunction && (
+          useInternalConfirmation ? (
+            <TouchableOpacity style={styles.deleteButton} onPress={callDelete}>
+              {deleteButtonLabel &&
+                <Text style={styles.deleteButtonText}>{deleteButtonLabel}</Text>
+              }
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity style={styles.deleteButton} onPress={async () => await deleteFunction()}>
+              {deleteButtonLabel &&
+                <Text style={styles.deleteButtonText}>{deleteButtonLabel}</Text>
+              }
+            </TouchableOpacity>
+          )
+        )}
       </View>
 
-      <CustomAlert
-        visible={alertVisible}
-        title={confirmationMessage}
-        message={confirmationMessageTitle}
-        onCancel={() => setAlertVisible(false)}
-        onConfirm={async () => {
-          await deleteFunction();
-          setAlertVisible(false);
-        }}
-      />
+      {useInternalConfirmation && (
+        <CustomAlert
+          visible={alertVisible}
+          title={confirmationMessage}
+          message={confirmationMessageTitle}
+          onCancel={() => setAlertVisible(false)}
+          onConfirm={async () => {
+            await deleteFunction();
+            setAlertVisible(false);
+          }}
+        />
+      )}
     </View>
   );
 }
