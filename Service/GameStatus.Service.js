@@ -6,7 +6,7 @@ import ImageHelper from "../utils/ImageHelper";
 
 export class GameStatusService {
     static async findAll() {
-        const result = ExecuteHttpRequest.callout({
+        const result = await ExecuteHttpRequest.callout({
             url: "/GameStatus",
             method: "GET",
             headers: authHeader,
@@ -26,7 +26,7 @@ export class GameStatusService {
     }
 
     static async findOne(id) {
-        const result = ExecuteHttpRequest.callout({
+        const result = await ExecuteHttpRequest.callout({
             url: `/GameStatus/${id}`,
             method: "GET",
             headers: authHeader,

@@ -11,20 +11,23 @@ export class GameService {
             ...(await authHeader()),
         };
 
-        const result = ExecuteHttpRequest.callout({
-        url: "/Game?BuscaImagem=true",
-        method: "GET",
-        headers: headers,
+
+        const result = await ExecuteHttpRequest.callout({
+            url: "/Game",
+            method: "GET",
+            headers: headers,
+            param: { getImage: true },
         });
-               
-        if (result.data.status != 200) {
+        
+
+        if (result.status != 200) {
             throw new Error(result.data.message);
         }
 
         let gameList = [];
 
-        if (result.data && result.data.data) {
-            result.data.data.forEach((dataUnit) => {
+        if (result.data && result.data.dataUnit) {
+            result.data.dataUnit.forEach((dataUnit) => {
                 let imagem64 = "";
                 
                 if (dataUnit.cover) {
@@ -32,16 +35,19 @@ export class GameService {
                 }
 
                 gameList.push(new GameModel({
-                    name : result.data.name,
-                    firstReleaseDate : result.data.firstReleaseDate,
+                    id: dataUnit.id,
+                    name : dataUnit.name,
+                    firstReleaseDate : dataUnit.firstReleaseDate,
                     cover : imagem64,
                     genre : new GenreModel({
-                        id :  result.data.genre.id,
-                        name :  result.data.genre.name
+                        id :  dataUnit.genre.id,
+                        name :  dataUnit.genre.name
                     })
                 }))
             })
         }
+        console.log(gameList)
+        return gameList;
     }
 
     static async findOne(id) {
@@ -50,7 +56,7 @@ export class GameService {
             ...(await authHeader()),
         };
 
-        const result = ExecuteHttpRequest.callout({
+        const result = await ExecuteHttpRequest.callout({
         url: `/Game/${id}`,
         method: "GET",
         headers: headers,
@@ -69,6 +75,7 @@ export class GameService {
 
 
         return new GameModel({
+            id: result.data.id,
             name : result.data.name,
             firstReleaseDate : result.data.firstReleaseDate,
             cover : imagem64,
@@ -80,7 +87,7 @@ export class GameService {
     }
 
     static async delete(id) {
-        return ExecuteHttpRequest.callout({
+        return await ExecuteHttpRequest.callout({
         url: `/Game/${id}`,
         method: "DELETE",
         headers: authHeader,
@@ -136,7 +143,7 @@ export class GameService {
         });
         }
 
-        return ExecuteHttpRequest.callout({
+        return await ExecuteHttpRequest.callout({
         url: "/Game",
         method: "POST",
         body: form,

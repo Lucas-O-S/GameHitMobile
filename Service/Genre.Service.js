@@ -10,7 +10,7 @@ export class GenreService {
             ...authHeader
         }
         
-        const result = ExecuteHttpRequest.callout({
+        const result = await ExecuteHttpRequest.callout({
             url: "/Genre",
             method: "GET",
             headers: headers,
