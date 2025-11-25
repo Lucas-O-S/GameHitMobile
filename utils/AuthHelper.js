@@ -5,6 +5,11 @@ export class AuthHelper {
   
   static #accessToken = null;
 
+  static async retrieveToken(){
+    this.#accessToken = await AsyncStorage.getItem('accessToken');
+    console.log("AcessToken salvo",this.#accessToken)
+  }
+
   static async setAccessToken(token) {
     
     this.#accessToken = token;
@@ -14,7 +19,7 @@ export class AuthHelper {
   }
 
   static async getAccessToken() {
-    console.log("aaaaaaaaaa ", this.#accessToken);
+    console.log("access token ", this.#accessToken);
     if (!this.#accessToken) {
       
       this.#accessToken = await AsyncStorage.getItem('accessToken');

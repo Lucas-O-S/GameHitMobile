@@ -25,8 +25,8 @@ export default function App() {
 
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const token = await AuthHelper.getAccessToken();
-      if (token && !AuthHelper.isTokenExpired()) {
+      AuthHelper.retrieveToken();
+      if ((await AuthHelper.getAccessToken()) && !AuthHelper.isTokenExpired()) {
         setIsLoggedIn(true);
       }
       setIsLoading(false);

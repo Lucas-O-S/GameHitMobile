@@ -6,9 +6,9 @@ import ImageHelper from "../utils/ImageHelper";
 
 export class GameService {
     static async findAll() {
-        
+        console.log("Chegou em find all")
         const headers = {
-            ...authHeader
+            ...(await authHeader()),
         };
 
         const result = ExecuteHttpRequest.callout({
@@ -45,10 +45,15 @@ export class GameService {
     }
 
     static async findOne(id) {
+
+        const headers = {
+            ...(await authHeader()),
+        };
+
         const result = ExecuteHttpRequest.callout({
         url: `/Game/${id}`,
         method: "GET",
-        headers: authHeader,
+        headers: headers,
         });
 
         
@@ -84,7 +89,7 @@ export class GameService {
 
     static async update(gameModel, imageUri) {
         const headers = { 
-            ...authHeader(),
+            ...(await authHeader()),
             ...multipartHeader
         };
 

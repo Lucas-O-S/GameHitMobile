@@ -85,7 +85,7 @@ export class UserService {
         console.log("Entrou em findAll");
 
         const headers = {
-            ...authHeader
+            ...(await authHeader()),
         };
 
         const result = await ExecuteHttpRequest.callout({
@@ -121,7 +121,7 @@ export class UserService {
         console.log("Entrou em findOne");
 
         const headers = {
-            ...authHeader,
+            ...(await authHeader()),
         };
 
         const result = await ExecuteHttpRequest.callout({
@@ -150,7 +150,7 @@ export class UserService {
 
         const headers = {
             ...jsonHeader,
-            ...authHeader
+            ...(await authHeader()),
         };
 
         const body = {
@@ -179,7 +179,7 @@ export class UserService {
         console.log("Entrou em delete");
 
         const headers = {
-            ...authHeader
+            ...(await authHeader()),
         };
 
         const result = await ExecuteHttpRequest.callout({
@@ -201,7 +201,7 @@ export class UserService {
         console.log("Entrou em retrieveUser");
 
         const headers = {
-            ...authHeader,
+            ...(await authHeader()),
             ...jsonHeader
         };
 
