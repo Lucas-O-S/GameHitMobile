@@ -1,21 +1,15 @@
 import { ExecuteHttpRequest } from "../utils/ExecuteHttpRequest";
 import { authHeader, jsonHeader, multipartHeader } from "../utils/HeaderHelper";
-import { AuthHelper } from "../utils/AuthHelper";
-import ImageHelper from "../utils/ImageHelper";
-import UserModel from "../Models/UserModel";
-import { UserWrapper } from "../Wrappers/UserWrapper";
-import { RegisterWrapper } from "../Wrappers/RegisterWrapper";
+import { registerWrapper } from "../Wrappers/RegisterWrapper";
 import RegisterModel from "../Models/RegisterModel";
 import { convertStandardDateToDmy } from "../utils/DateConverter";
 
-export class UserService {
+export class RegisterService {
 
     static async create(registerModel) {
-        console.log("Entrou em create");
-
         const headers = {
             ...multipartHeader,
-            ...AuthHelper
+            ...(await authHeader())
         };
 
         const body = registerWrapper(registerModel);
@@ -35,10 +29,8 @@ export class UserService {
     }
 
     static async findAll() {
-        console.log("Entrou em findAll");
-
         const headers = {
-            ...authHeader
+            ...(await authHeader()),
         };
 
         const result = await ExecuteHttpRequest.callout({
@@ -47,40 +39,33 @@ export class UserService {
             headers: headers
         });
 
-        console.log(JSON.stringify(result));
-
-        let RegisterList = [];
+        let registerList = [];
 
         if (result.data && result.data.data) {
             result.data.data.forEach((dataUnit) => {
-                RegisterList.push(new RegisterModel({
-                    id : dataUnit.id,
-                    review : dataUnit.review,
-                    startedDate : convertStandardDateToDmy(dataUnit.startedDate),
-                    completedDate : convertStandardDateToDmy(dataUnit.completedDate),
-                    personalRating : dataUnit.personalRating,
-                    userId : dataUnit.userId,
-                    gameId : dataUnit.gameId,
-                    gameStatusId : dataUnit.gameStatusId,
-
+                registerList.push(new RegisterModel({
+                    id: dataUnit.id,
+                    review: dataUnit.review,
+                    startedDate: convertStandardDateToDmy(dataUnit.startedDate),
+                    completedDate: convertStandardDateToDmy(dataUnit.completedDate),
+                    personalRating: dataUnit.personalRating,
+                    userId: dataUnit.userId,
+                    game: dataUnit.game,
+                    gameStatus: dataUnit.gameStatus,
                 }));
             });
         }
-
-        console.log(usersList);
 
         if (result.data.status !== 200) {
             throw new Error(result.data.message);
         }
 
-        return usersList;
+        return registerList;
     }
 
     static async findAllByUser(userId) {
-        console.log("Entrou em findAll");
-
         const headers = {
-            ...authHeader
+            ...(await authHeader()),
         };
 
         const result = await ExecuteHttpRequest.callout({
@@ -89,121 +74,101 @@ export class UserService {
             headers: headers
         });
 
-        console.log(JSON.stringify(result));
-
-        let RegisterList = [];
+        let registerList = [];
 
         if (result.data && result.data.data) {
             result.data.data.forEach((dataUnit) => {
-                RegisterList.push(new RegisterModel({
-                    id : dataUnit.id,
-                    review : dataUnit.review,
-                    startedDate : convertStandardDateToDmy(dataUnit.startedDate),
-                    completedDate : convertStandardDateToDmy(dataUnit.completedDate),
-                    personalRating : dataUnit.personalRating,
-                    userId : dataUnit.userId,
-                    gameId : dataUnit.gameId,
-                    gameStatusId : dataUnit.gameStatusId,
-
+                registerList.push(new RegisterModel({
+                    id: dataUnit.id,
+                    review: dataUnit.review,
+                    startedDate: convertStandardDateToDmy(dataUnit.startedDate),
+                    completedDate: convertStandardDateToDmy(dataUnit.completedDate),
+                    personalRating: dataUnit.personalRating,
+                    userId: dataUnit.userId,
+                    game: dataUnit.game,
+                    gameStatus: dataUnit.gameStatus,
                 }));
             });
         }
-
-        console.log(usersList);
 
         if (result.data.status !== 200) {
             throw new Error(result.data.message);
         }
 
-        return usersList;
+        return registerList;
     }
 
-    static async findAllByStatus(userId, StatusId) {
-        console.log("Entrou em findAll");
-
+    static async findAllByStatus(userId, statusId) {
         const headers = {
-            ...authHeader
+            ...(await authHeader()),
         };
 
         const result = await ExecuteHttpRequest.callout({
-            url: "/Register/findByUser/" + userId,
+            url: `/Register/findByUser/${userId}/status/${statusId}`,
             method: "GET",
             headers: headers
         });
 
-        console.log(JSON.stringify(result));
-
-        let RegisterList = [];
+        let registerList = [];
 
         if (result.data && result.data.data) {
             result.data.data.forEach((dataUnit) => {
-                RegisterList.push(new RegisterModel({
-                    id : dataUnit.id,
-                    review : dataUnit.review,
-                    startedDate : convertStandardDateToDmy(dataUnit.startedDate),
-                    completedDate : convertStandardDateToDmy(dataUnit.completedDate),
-                    personalRating : dataUnit.personalRating,
-                    userId : dataUnit.userId,
-                    gameId : dataUnit.gameId,
-                    gameStatusId : dataUnit.gameStatusId,
-
+                registerList.push(new RegisterModel({
+                    id: dataUnit.id,
+                    review: dataUnit.review,
+                    startedDate: convertStandardDateToDmy(dataUnit.startedDate),
+                    completedDate: convertStandardDateToDmy(dataUnit.completedDate),
+                    personalRating: dataUnit.personalRating,
+                    userId: dataUnit.userId,
+                    game: dataUnit.game,
+                    gameStatus: dataUnit.gameStatus,
                 }));
             });
         }
-
-        console.log(usersList);
 
         if (result.data.status !== 200) {
             throw new Error(result.data.message);
         }
 
-        return usersList;
+        return registerList;
     }
 
     static async findOne(id) {
-        console.log("Entrou em findOne");
-
         const headers = {
-            ...authHeader,
+            ...(await authHeader()),
         };
 
         const result = await ExecuteHttpRequest.callout({
-            url: "/user/" + id,
+            url: "/Register/" + id,
             method: "GET",
             headers: headers
         });
 
-        console.log(JSON.stringify(result));
-
         if (result.data.status !== 200) {
-            throw new Error(result.data.message);
+            throw new Error(result.data?.message || "Registro não encontrado");
         }
 
         const dataUnit = result.data.data;
 
         return new RegisterModel({
-                    id : dataUnit.id,
-                    review : dataUnit.review,
-                    startedDate : convertStandardDateToDmy(dataUnit.startedDate),
-                    completedDate : convertStandardDateToDmy(dataUnit.completedDate),
-                    personalRating : dataUnit.personalRating,
-                    userId : dataUnit.userId,
-                    gameId : dataUnit.gameId,
-                    gameStatusId : dataUnit.gameStatusId,
-
-                });
+            id: dataUnit.id,
+            review: dataUnit.review,
+            startedDate: convertStandardDateToDmy(dataUnit.startedDate),
+            completedDate: convertStandardDateToDmy(dataUnit.completedDate),
+            personalRating: dataUnit.personalRating,
+            userId: dataUnit.userId,
+            game: dataUnit.game,
+            gameStatus: dataUnit.gameStatus,
+        });
     }
 
-    static async update(userModel, id) {
-        console.log("Entrou em update");
-
+    static async update(registerModel, id) {
         const headers = {
             ...jsonHeader,
-            ...authHeader
+            ...(await authHeader())
         };
 
         const body = registerWrapper(registerModel);
-
 
         const result = await ExecuteHttpRequest.callout({
             url: "/Register/" + id,
@@ -212,21 +177,16 @@ export class UserService {
             headers: headers
         });
 
-        console.log(JSON.stringify(result));
-
-        const resultBody = result.data;
         if (result.data.status !== 200) {
-            throw new Error(resultBody.message);
+            throw new Error(result.data.message);
         }
 
-        return result;
+        return result.data;
     }
 
     static async delete(id) {
-        console.log("Entrou em delete");
-
         const headers = {
-            ...authHeader
+            ...(await authHeader())
         };
 
         const result = await ExecuteHttpRequest.callout({
@@ -235,13 +195,11 @@ export class UserService {
             headers: headers
         });
 
-        console.log(JSON.stringify(result));
-
-        if (result.status !== 200) {
+        if (result.data.status !== 200) {
             throw new Error(result.data.message);
         }
 
-        return result;
+        return result.data;
     }
 
 }
