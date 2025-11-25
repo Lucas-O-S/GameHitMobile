@@ -14,12 +14,13 @@ export class AuthHelper {
   }
 
   static async getAccessToken() {
+    console.log("aaaaaaaaaa ", this.#accessToken);
     if (!this.#accessToken) {
       
       this.#accessToken = await AsyncStorage.getItem('accessToken');
     
     }
-  
+    
     return this.#accessToken;
   }
 

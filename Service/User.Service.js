@@ -15,8 +15,8 @@ export class UserService {
         };
 
         const body = {
-            email: email,
-            password: password
+            email: `${userModel.email}`,
+            password: `${userModel.password}`
         };
 
         const result = await ExecuteHttpRequest.callout({

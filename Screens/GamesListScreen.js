@@ -1,9 +1,13 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useEffect, useState, useContext, useCallback } from "react";
 import { View, FlatList, Alert, Text } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
+
 import ListItemComponent from "../Components/ListItemComponent";
 import LoadingOverlay from "../Components/LoadingOverlay";
 import IconButtonComponent from "../Components/IconButtonComponent";
+
 import GameController from "../Controller/Game.Controller";
+
 import { GlobalStyles, Colors } from "../Styles/Theme";
 import { AuthContext } from "../utils/AuthContext";
 
@@ -11,6 +15,25 @@ export default function GamesListScreen({ navigation }) {
     const { user } = useContext(AuthContext);
     const [games, setGames] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    useFocusEffect(
+      useCallback(() => {
+        
+        let timeout;
+
+        async function loadData() {
+          await loadGames();
+          timeout = setTimeout(loadData, 60000);
+        }
+
+        loadData();
+
+        return () => {
+          clearTimeout(timeout);
+        };
+
+      }, [])
+    );
 
     async function loadGames() {
       setLoading(true);
@@ -23,11 +46,6 @@ export default function GamesListScreen({ navigation }) {
           setLoading(false);
       }
     }
-
-    useEffect(() => {
-      const unsub = navigation.addListener("focus", loadGames);
-      return unsub;
-    }, []);
 
     return (
       <View style={GlobalStyles.container}>

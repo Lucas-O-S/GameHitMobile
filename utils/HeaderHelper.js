@@ -12,8 +12,8 @@ export const authHeader = () => {
 
   const accessToken = AuthHelper.getAccessToken();
 
+  console.log("aaaaaaaaaa ", accessToken);
   if (accessToken) {
-
     return {
 
       'Authorization': `Bearer ${accessToken}`

@@ -1,38 +1,58 @@
-import React, { useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import { ActivityIndicator, View } from 'react-native';
-
-import { AuthProvider, AuthContext } from './utils/AuthContext';
-import AuthNavigator from './Navigation/AuthNavigator';
-import AdminNavigator from './Navigation/AdminNavigator';
-import UserNavigator from './Navigation/UserNavigator';
 import { Colors } from './Styles/Theme';
+import { Text } from 'react-native';
 
-function Routes() {
-  const { signed, user, loading } = useContext(AuthContext);
+import LoginScreen from './Screens/LoginScreen';
+import RegisterScreen from './Screens/RegisterScreen';
+import HomeScreen from './Screens/HomeScreen';
+import EditUserScreen from './Screens/EditUserScreen';
+import GamesScreen from './Screens/GamesScreen';
+import AddGameScreen from './Screens/AddGameScreen';
+import EditGameScreen from './Screens/EditGameScreen';
+import GameDetailScreen from './Screens/GameDetailScreen';
+import GamesListScreen from './Screens/GamesListScreen';
 
-  if (loading) {
-    return (
-      <View style={{flex:1, backgroundColor: Colors.background, justifyContent:'center', alignItems:'center'}}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-      </View>
-    );
-  }
+import { AuthHelper } from './utils/AuthHelper';
 
-  if (!signed) return <AuthNavigator />;
-  
-  // Role 1 = Admin, Role 2 = User
-  return user?.roleId === 1 ? <AdminNavigator /> : <UserNavigator />;
-}
+const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = await AuthHelper.getAccessToken();
+      if (token && !AuthHelper.isTokenExpired()) {
+        setIsLoggedIn(true);
+      }
+      setIsLoading(false);
+    };
+
+    checkLoginStatus();
+  }, []);
+
+  if (isLoading) {
+    return <Text>Loading...</Text>;
+  }
+
   return (
     <NavigationContainer>
-      <AuthProvider>
-        <StatusBar style="light" backgroundColor={Colors.background} />
-        <Routes />
-      </AuthProvider>
+        <Stack.Navigator initialRouteName={isLoggedIn ? "Home" : "Login"}>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Register" component={RegisterScreen} />
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="User" component={EditUserScreen} />
+          <Stack.Screen name="GamesScreen" component={GamesScreen} />
+          <Stack.Screen name="AddGameScreen" component={AddGameScreen} />
+          <Stack.Screen name="EditGameScreen" component={EditGameScreen} />
+          <Stack.Screen name="GameDetailScreen" component={GameDetailScreen} />
+          <Stack.Screen name="GamesListScreen" component={GamesListScreen} />
+        </Stack.Navigator>
+      <StatusBar style="auto" />
     </NavigationContainer>
   );
 }

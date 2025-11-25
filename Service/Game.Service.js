@@ -6,12 +6,16 @@ import ImageHelper from "../utils/ImageHelper";
 
 export class GameService {
     static async findAll() {
+        
+        const headers = {
+            ...authHeader
+        };
+
         const result = ExecuteHttpRequest.callout({
         url: "/Game?BuscaImagem=true",
         method: "GET",
-        headers: authHeader,
+        headers: headers,
         });
-
                
         if (result.data.status != 200) {
             throw new Error(result.data.message);
