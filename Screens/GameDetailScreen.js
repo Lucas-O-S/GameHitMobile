@@ -79,7 +79,14 @@ export default function GameDetailScreen({ route, navigation }) {
                         <Text style={{ color: Colors.primary, fontSize: 16, fontWeight: 'bold' }}>{game.genre.name}</Text>
                     </>
                 )}
+
             </View>
+
+            <ButtonComponent
+                label={"Criar Registro deste Jogo"}
+                pressFunction={() => navigation.navigate("GameRegisterScreen")}
+            />
+
 
         </ScrollView>
     );

@@ -23,6 +23,8 @@ export class GameStatusService {
 
         });
 
+        return GenreList;
+
     }
 
     static async findOne(id) {

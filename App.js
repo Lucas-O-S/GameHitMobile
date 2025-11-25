@@ -14,6 +14,7 @@ import AddGameScreen from './Screens/AddGameScreen';
 import EditGameScreen from './Screens/EditGameScreen';
 import GameDetailScreen from './Screens/GameDetailScreen';
 import GamesListScreen from './Screens/GamesListScreen';
+import GameRegisterScreen from './Screens/GameRegisterScreen';
 
 import { AuthHelper } from './utils/AuthHelper';
 
@@ -51,6 +52,7 @@ export default function App() {
           <Stack.Screen name="EditGameScreen" component={EditGameScreen} />
           <Stack.Screen name="GameDetailScreen" component={GameDetailScreen} />
           <Stack.Screen name="GamesListScreen" component={GamesListScreen} />
+          <Stack.Screen name="GameRegisterScreen" component={GameRegisterScreen} />
         </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>
