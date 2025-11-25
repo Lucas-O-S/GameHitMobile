@@ -1,22 +1,73 @@
+import GameModel from "../Models/GameModel";
+import GenreModel from "../Models/Genre.model";
 import { ExecuteHttpRequest } from "../utils/ExecuteHttpRequest";
 import { authHeader } from "../utils/HeaderHelper";
 import ImageHelper from "../utils/ImageHelper";
 
 export class GameService {
     static async findAll() {
-        return ExecuteHttpRequest.callout({
+        const result = ExecuteHttpRequest.callout({
         url: "/Game?BuscaImagem=true",
         method: "GET",
         headers: authHeader,
         });
+
+               
+        if (result.data.status != 200) {
+            throw new Error(result.data.message);
+        }
+
+        let gameList = [];
+
+        if (result.data && result.data.data) {
+            result.data.data.forEach((dataUnit) => {
+                let imagem64 = "";
+                
+                if (dataUnit.cover) {
+                    imagem64 = ImageHelper.convertByteToBase64(dataUnit.cover);
+                }
+
+                gameList.push(new GameModel({
+                    name : result.data.name,
+                    firstReleaseDate : result.data.firstReleaseDate,
+                    cover : imagem64,
+                    genre : new GenreModel({
+                        id :  result.data.genre.id,
+                        name :  result.data.genre.name
+                    })
+                }))
+            })
+        }
     }
 
     static async findOne(id) {
-        return ExecuteHttpRequest.callout({
+        const result = ExecuteHttpRequest.callout({
         url: `/Game/${id}`,
         method: "GET",
         headers: authHeader,
         });
+
+        
+        if (result.data.status != 200) {
+            throw new Error(result.data.message);
+        }
+
+        let imagem64 = "";
+        
+        if (data.data.dataUnit.cover) {
+            imagem64 = ImageHelper.convertByteToBase64(dataUnit.cover);
+        }
+
+
+        return new GameModel({
+            name : result.data.name,
+            firstReleaseDate : result.data.firstReleaseDate,
+            cover : imagem64,
+            genre : new GenreModel({
+                id :  result.data.genre.id,
+                name :  result.data.genre.name
+            })
+        })
     }
 
     static async delete(id) {
