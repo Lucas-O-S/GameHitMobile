@@ -10,7 +10,7 @@ export default function InputDateComponent({
   onChangeText, 
   placeholder, 
   style,
-  tipo = "spinner" //Spinner ou Calendar
+  tipo = "Calendar" //Spinner ou Calendar
 }) {
 
     const [showPicker, setShowPicker] = useState(false);
