@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { View, Alert, ScrollView, Text } from "react-native";
+import { View, Alert, ScrollView, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import InputTextComponent from "../Components/InputTextComponent";
@@ -12,6 +12,7 @@ import UserModel from "../Models/UserModel";
 import { GlobalStyles, Colors } from "../Styles/Theme";
 import { AuthHelper } from "../utils/AuthHelper";
 import ImageHelper from "../utils/ImageHelper";
+import CustomAlert from "../Components/CustomAlert";
 
 export default function EditUserScreen({ navigation }) {
 
@@ -24,6 +25,7 @@ export default function EditUserScreen({ navigation }) {
     const [image64, setImage64] = useState(null);
 
     const [loading, setLoading] = useState(false);
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
 
     useFocusEffect(
         useCallback(() => {
@@ -99,6 +101,23 @@ export default function EditUserScreen({ navigation }) {
         }
     }
 
+    async function handleDeleteConfirm() {
+        setDeleteModalVisible(false);
+        setLoading(true);
+        try {
+            await UserController.deleteUser(userId);
+            await AuthHelper.clearAccessToken();
+
+            // reset navigation to Login
+            navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+        } catch (error) {
+            console.log('Erro ao deletar usuário:', error);
+            Alert.alert('Erro', error.message || 'Falha ao deletar usuário');
+        } finally {
+            setLoading(false);
+        }
+    }
+
     return (
         <ScrollView contentContainerStyle={GlobalStyles.container}>
             <LoadingOverlay visible={loading} />
@@ -129,6 +148,36 @@ export default function EditUserScreen({ navigation }) {
             <View style={{ marginTop: 20 }}>
                 <ButtonComponent label="Salvar Alterações" pressFunction={save} />
             </View>
+            <View style={{ marginTop: 12 }}>
+                <TouchableOpacity style={styles.deleteButton} onPress={() => setDeleteModalVisible(true)}>
+                    <Text style={styles.deleteButtonText}>Deletar Conta</Text>
+                </TouchableOpacity>
+            </View>
+
+            <CustomAlert
+                visible={deleteModalVisible}
+                title={"Excluir minha conta"}
+                message={"Tem certeza que deseja deletar sua conta? Esta ação não poderá ser desfeita."}
+                onConfirm={handleDeleteConfirm}
+                onCancel={() => setDeleteModalVisible(false)}
+                confirmText={"Deletar"}
+                cancelText={"Cancelar"}
+            />
         </ScrollView>
     );
 }
+
+const styles = StyleSheet.create({
+    deleteButton: {
+        paddingVertical: 12,
+        paddingHorizontal: 16,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: Colors.danger,
+        alignItems: 'center'
+    },
+    deleteButtonText: {
+        color: Colors.danger,
+        fontWeight: 'bold'
+    }
+});
