@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import CustomAlert from "./CustomAlert";
+import { GlobalStyles, Colors } from "../Styles/Theme";
 
 export function ListItemComponent({
     content = null,
@@ -24,30 +25,26 @@ export function ListItemComponent({
   }
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.contentContainer} onPress={onPress}>
+    <View style={GlobalStyles.listItem}>
+      <TouchableOpacity style={GlobalStyles.listItemContent} onPress={onPress}>
         {content && content()}
       </TouchableOpacity>
 
-      <View style={styles.buttonContainer}>
-        {showEditButton && editFunction &&
-          <TouchableOpacity style={styles.editButton} onPress={editFunction}>
-            <Text style={styles.editButtonText}>{editButtonLabel}</Text>
+      <View style={GlobalStyles.listItemButtons}>
+        {showEditButton && editFunction && (
+          <TouchableOpacity style={[GlobalStyles.listItemButton]} onPress={editFunction}>
+            <Text style={GlobalStyles.listItemButtonText}>{editButtonLabel}</Text>
           </TouchableOpacity>
-        }
+        )}
 
         {showDeleteButton && deleteFunction && (
           useInternalConfirmation ? (
-            <TouchableOpacity style={styles.deleteButton} onPress={callDelete}>
-              {deleteButtonLabel &&
-                <Text style={styles.deleteButtonText}>{deleteButtonLabel}</Text>
-              }
+            <TouchableOpacity style={[GlobalStyles.listItemButton, { backgroundColor: Colors.danger }]} onPress={callDelete}>
+              {deleteButtonLabel && <Text style={GlobalStyles.listItemButtonText}>{deleteButtonLabel}</Text>}
             </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.deleteButton} onPress={async () => await deleteFunction()}>
-              {deleteButtonLabel &&
-                <Text style={styles.deleteButtonText}>{deleteButtonLabel}</Text>
-              }
+            <TouchableOpacity style={[GlobalStyles.listItemButton, { backgroundColor: Colors.danger }]} onPress={async () => await deleteFunction()}>
+              {deleteButtonLabel && <Text style={GlobalStyles.listItemButtonText}>{deleteButtonLabel}</Text>}
             </TouchableOpacity>
           )
         )}
