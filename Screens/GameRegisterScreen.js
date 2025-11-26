@@ -3,11 +3,19 @@ import { View, Text, Alert, Image, ScrollView } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
 import LoadingOverlay from "../Components/LoadingOverlay";
-import ComboBoxComponent from "../Components/ComboBoxComponent";
+import { ComboBoxComponent } from "../Components/ComboBoxComponent";
 
 import { GlobalStyles, Colors } from "../Styles/Theme";
 import { AuthHelper } from "../utils/AuthHelper";
+
 import GameStatusController from "../Controller/GameStatus.Controller";
+import RegisterController from "../Controller/Register.Controller";
+
+import InputDateComponent from "../Components/InputDateComponent";
+import InputTextComponent from "../Components/InputTextComponent";
+import ButtonComponent from "../Components/ButtonComponent";
+import RegisterModel from "../Models/RegisterModel";
+import GameStatusModel from "../Models/GameStatus.model";
 
 export default function GameRegisterScreen({ route, navigation }) {
 
@@ -17,6 +25,11 @@ export default function GameRegisterScreen({ route, navigation }) {
     const [gameStatusId, setGameStatusId] = useState(null);
     const [gameStatusList, setGameStatusList] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const [review, setReview] = useState("");
+    const [completedDate, setCompletedDate] = useState("");
+    const [startedDate, setStartedDate] = useState("");
+    const [personalRating, setPersonalRating] = useState("");
 
     useFocusEffect(
         useCallback(() => {
@@ -38,6 +51,8 @@ export default function GameRegisterScreen({ route, navigation }) {
 
             setGameStatusList(result);
 
+            console.log("Status de jogo: ", JSON.stringify(result[0].name));
+
         } catch {
             Alert.alert("Erro", "Falha ao carregar dados.");
             navigation.goBack();
@@ -48,35 +63,42 @@ export default function GameRegisterScreen({ route, navigation }) {
         }
     }
 
-    async function handleSave() {
-        if (!gameStatusId) {
-            Alert.alert("Erro", "Selecione um status.");
-            return;
-        }
-
-        try {
+    async function handleRegister() {
+            if (!startedDate || !gameStatusId) {
+                return Alert.alert("Atenção", "Preencha todos os campos obrigatórios.");
+            }
+    
             setLoading(true);
-
-            await RegisterController.updateGame({
-                userId,
-                gameId: game.id,
-                gameStatusId
-            });
-
-            Alert.alert("Sucesso", "Registro criado!");
-            navigation.goBack();
-
-        } catch (error) {
-            Alert.alert("Erro", "Falha ao criar registro.");
-        } finally {
-            setLoading(false);
+    
+            try {
+                const newRegister = new RegisterModel({
+                    completedDate: completedDate,
+                    startedDate: startedDate,
+                    personalRating: personalRating,
+                    gameStatus: new GameStatusModel({ id: gameStatusId }),
+                    userId: userId,
+                    game: game,
+                    review: review
+                });
+    
+                await RegisterController.create(newRegister);
+    
+                Alert.alert("Sucesso!", "Registro criado.");
+                navigation.goBack();
+    
+            } catch (error) {
+                Alert.alert("Erro no Registro", error.message);
+            } finally {
+                setLoading(false);
+            }
         }
-    }
 
     if (loading || !game) return <LoadingOverlay visible={true} />;
 
     return (
-        <ScrollView contentContainerStyle={GlobalStyles.container}>
+        <View style={{ flex: 1, background: "#121214"}}>
+        <ScrollView contentContainerStyle={{ padding: 20 }}
+        showsVerticalScrollIndicator={false}>
             {game.cover ? (
                 <Image
                     source={{ uri: game.cover }}
@@ -96,21 +118,51 @@ export default function GameRegisterScreen({ route, navigation }) {
 
                 <ComboBoxComponent
                     label=""
-                    items={gameStatusList}
+                    items={gameStatusList.map(s => ({ label: s.name, value: s.id }))}
                     onChange={(v) => setGameStatusId(v)}
-                    placeHolder={{ label: "Selecione o status", value: null }}
+                    placeholder={{ label: "Selecione o status", value: null }}
                 />
 
                 <Text style={{ marginTop: 10, color: Colors.textSecondary }}>
                     Selecionado: {gameStatusId || "Nenhum"}
                 </Text>
             </View>
+            
+            <InputDateComponent
+                label={"Data de Início"}
+                value={startedDate}
+                onChangeText={setStartedDate}
+                placeholder={"DD/MM/AAAA"}
+            />
+
+            <InputDateComponent
+                label={"Data de Conclusão"}
+                value={completedDate}
+                onChangeText={setCompletedDate}
+                placeholder={"DD/MM/AAAA"}
+            />
+            
+            <InputTextComponent
+                label={"Avaliação Pessoal"}
+                value={personalRating}
+                onChangeText={setPersonalRating}
+                keyboardType="numeric"
+                placeholder={"De 0 a 10, qual a sua nota?"}
+            />
+
+            <InputTextComponent
+                label={"Review Pessoal"}
+                value={review}
+                onChangeText={setReview}
+                placeholder={"Digite sua review pessoal"}
+            />
 
             <View style={{ marginTop: 20 }}>
                 <ButtonComponent
-                    label="Salvar Registro"
-                    pressFunction={handleSave} />
+                    label={"Salvar Registro"}
+                    pressFunction={handleRegister} />
             </View>
         </ScrollView>
+        </View>
     );
 }
