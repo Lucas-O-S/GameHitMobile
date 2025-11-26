@@ -80,9 +80,14 @@ export class RegisterService {
         let registerList = [];
 
 
-        if (result.data && result.data.data) {
+ if (result.data && result.data.data) {
+
 
             result.data.data.forEach((dataUnit) => {
+                const image64 = dataUnit.game.cover
+                    ? ImageHelper.convertByteToBase64(dataUnit.game.cover)
+                    : null;
+
                 console.log("game id:", dataUnit.game.id);
                 registerList.push(new RegisterModel({
                     id: dataUnit.id,
@@ -91,11 +96,19 @@ export class RegisterService {
                     completedDate: convertStandardDateToDmy(dataUnit.completedDate),
                     personalRating: dataUnit.personalRating,
                     userId: dataUnit.userId,
-                    game: new GameModel(dataUnit.game),
+                    game: new GameModel({
+                        name: dataUnit.game.name,
+                        id: dataUnit.game.id,
+                        firstReleaseDate: dataUnit.game.firstReleaseDate,
+                        cover: image64,
+                        genre: dataUnit.game.genre
+
+                    }),
                     gameStatus: new GameStatusModel (dataUnit.gameStatus),
                 }));
             });
         }
+
 
         if (result.data.status !== 200) {
             throw new Error(result.data.message);
