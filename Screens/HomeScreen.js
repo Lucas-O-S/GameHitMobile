@@ -1,21 +1,40 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { AuthHelper } from "../utils/AuthHelper";
 import { GlobalStyles, Colors } from "../Styles/Theme";
 import UserController from "../Controller/User.Controller";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomeScreen({ navigation }) {
     const [userName, setUserName] = useState("Player");
+    const [userId, setUserId] = useState(null);
+    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        async function getName() {
-            try {
-            } catch (e) { console.log(e)}
+    useFocusEffect(
+            useCallback(() => {
+          async function loadData() {
+            await firstLoad();
+          }
+    
+          loadData();
+            }, [])
+        );
+    
+      async function firstLoad() {
+        setLoading(true);
+        try {
+          const id = await AuthHelper.getUserIdFromToken();
+          setUserId(id);
+            const user = await UserController.findOneUser(id);
+            setUserName(user.username);
+        } catch (error) {
+          console.log(error);
+          setRegisters([]);
+        } finally {
+          setLoading(false);
         }
-        getName();
-    }, []);
+    }
 
     async function handleSignOut() {
         try {
