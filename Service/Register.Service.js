@@ -10,7 +10,7 @@ export class RegisterService {
 
     static async create(registerModel) {
         const headers = {
-            ...multipartHeader,
+            ...jsonHeader,
             ...(await authHeader())
         };
 
