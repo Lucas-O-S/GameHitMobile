@@ -8,12 +8,11 @@ export const jsonHeader = {
   'Content-Type': 'application/json'
 };
 
-export const authHeader = () => {
+export const authHeader = async () => {
 
-  const accessToken = AuthHelper.getAccessToken();
+  const accessToken = await AuthHelper.getAccessToken();
 
   if (accessToken) {
-
     return {
 
       'Authorization': `Bearer ${accessToken}`

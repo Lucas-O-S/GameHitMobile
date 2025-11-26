@@ -1,63 +1,88 @@
-import React, { useEffect, useState, useContext } from "react";
-import { View, FlatList, Alert, Text } from "react-native";
-import ListItemComponent from "../Components/ListItemComponent";
+import React, { useState } from "react";
+import { View, Alert, Text } from "react-native";
+import InputTextComponent from "../Components/InputTextComponent";
+import InputDateComponent from "../Components/InputDateComponent";
+import ButtonComponent from "../Components/ButtonComponent";
 import LoadingOverlay from "../Components/LoadingOverlay";
-import IconButtonComponent from "../Components/IconButtonComponent";
 import GameController from "../Controller/Game.Controller";
+import GameModel from "../Models/GameModel";
 import { GlobalStyles, Colors } from "../Styles/Theme";
-import { AuthContext } from "../utils/AuthContext";
+import { convertDmyToStandardDate } from "../utils/DateConverter";
+import InputImageComponent from "../Components/InputImageComponent";
 
 export default function GamesListScreen({ navigation }) {
-    const { user } = useContext(AuthContext);
-    const [games, setGames] = useState([]);
+    const [name, setName] = useState("");
+    const [date, setDate] = useState("");
+    const [genreId, setGenreId] = useState("");
+    const [imageUri, setImageUri] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    async function loadGames() {
+    async function handleAddGame() {
+        if (!name || !date || !genreId) {
+            return Alert.alert("Atenção", "Por favor, preencha todos os campos obrigatórios.");
+        }
+
         setLoading(true);
-        try {
-            const data = await GameController.findAllGames();
-            setGames(data);
+
+        try{
+            const standartDate = convertDmyToStandardDate(date);
+
+            const newGame = new GameModel({
+                name: name,
+                firstReleaseDate: standartDate,
+                genreId: parseInt(genreId),
+            });
+
+            await GameController.createGame(newGame, imageUri);
+
+            Alert.alert("Sucesso", "Jogo adicionado com sucesso!");
+            navigation.goBack();
         } catch (e) {
-            Alert.alert("Erro", e.message);
+            Alert.alert("Erro ao criar", e.message);
         } finally {
             setLoading(false);
         }
     }
 
-    useEffect(() => {
-        const unsub = navigation.addListener("focus", loadGames);
-        return unsub;
-    }, []);
-
     return (
-        <View style={GlobalStyles.container}>
-        <LoadingOverlay visible={loading} />
+        <ScrollView contentContainerStyle={GlobalStyles.container}>
+        <LoadingOverlay visible={loading} message="Adicionando jogo..." />
 
-        <FlatList
-            data={games}
-            keyExtractor={(item) => String(item.id)}
-            contentContainerStyle={{ paddingBottom: 80 }}
-            renderItem={({ item }) => (
-            <ListItemComponent
-                title={item.name}
-                subtitle={item.firstReleaseDate}
-                onPress={() => navigation.navigate("GameDetail", { id: item.id })}
-            />
-            )}
-            ListEmptyComponent={<Text style={{color: Colors.textSecondary, textAlign: 'center', marginTop: 50}}>Nenhum jogo encontrado</Text>}
+        <Text style={GlobalStyles.title}>Novo Jogo</Text>
+
+        <InputImageComponent
+            label="Capa do Jogo"
+            onChange={(file) => setImageUri(file.uri)}
         />
 
-        {user?.roleId === 1 && (
-            <View style={{ position: 'absolute', bottom: 20, right: 20 }}>
-                <IconButtonComponent 
-                    iconName="add" 
-                    size={30} 
-                    color="#FFF" 
-                    style={{ backgroundColor: Colors.primary, borderRadius: 30, width: 60, height: 60, elevation: 5 }}
-                    onPress={() => navigation.navigate("AddGame")}
-                />
-            </View>
-        )}
+        <InputTextComponent
+            label="Nome do Jogo"
+            value={name}
+            onChangeText={setName}
+            placeholder="Digite o nome do jogo"
+        />
+
+        <InputDateComponent
+            label="Data de Lançamento"
+            value={date}
+            onChangeText={setDate}
+            tipo="calendar"
+            placeholder="DD/MM/AAAA"
+        />
+
+        <InputTextComponent
+            label="ID do Gênero"
+            value={genreId}
+            onChangeText={setGenreId}
+            keyboardType="numeric"
+            placeholder="Ex.: 1"
+        />
+
+        <View style={{ marginTop: 20 }}>
+            <ButtonComponent
+                label="Adicionar Jogo"
+                pressFunction={handleAddGame} />
         </View>
+    </ScrollView>
     );
 }

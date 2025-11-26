@@ -1,90 +1,118 @@
-import React, { useEffect, useState } from 'react';
-import { View, FlatList, StyleSheet, Text } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
-import GameController from '../Controller/Game.Controller';
-import { ListItemComponent } from '../Components/ListItemComponent';
-import ImageComponent from '../Components/ImageComponent';
-import IconButtonComponent from '../Components/IconButtonComponent';
-import LoadingOverlay from '../Components/LoadingOverlay';
-import { convertStandardDateToDmy } from '../utils/DateConverter';
+import React, { useState, useCallback } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
+import { AuthHelper } from "../utils/AuthHelper";
+import { GlobalStyles, Colors } from "../Styles/Theme";
+import UserController from "../Controller/User.Controller";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function HomeScreen({ navigation }) {
-    const [games, setGames] = useState([]);
+    const [userName, setUserName] = useState("Player");
+    const [userId, setUserId] = useState(null);
     const [loading, setLoading] = useState(false);
-    const isFocused = useIsFocused();
 
-    async function loadGames() {
+    useFocusEffect(
+            useCallback(() => {
+          async function loadData() {
+            await firstLoad();
+          }
+    
+          loadData();
+            }, [])
+        );
+    
+      async function firstLoad() {
         setLoading(true);
         try {
-            const data = await GameController.findAllGames();
-            setGames(data);
+          const id = await AuthHelper.getUserIdFromToken();
+          setUserId(id);
+            const user = await UserController.findOneUser(id);
+            setUserName(user.username);
         } catch (error) {
-            console.log(error);
+          console.log(error);
+          setRegisters([]);
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
     }
 
-    useEffect(() => {
-        if (isFocused) loadGames();
-    }, [isFocused]);
+    async function handleSignOut() {
+        try {
+            await AuthHelper.clearAccessToken();
 
-    // Função que renderiza o conteúdo interno do ListItem
-    const renderGameContent = (game) => (
-        <View style={styles.itemRow}>
-            <ImageComponent 
-                image64={game.cover} 
-                style={{ width: 60, height: 60, marginRight: 10 }} 
-            />
-            <View>
-                <Text style={styles.gameTitle}>{game.name}</Text>
-                <Text style={styles.gameSubtitle}>
-                    {convertStandardDateToDmy(game.firstReleaseDate)}
-                </Text>
-                {game.genre && <Text style={styles.gameGenre}>{game.genre.name}</Text>}
-            </View>
-        </View>
-    );
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }],
+            });
+        } catch (error) {
+            console.log("Erro ao sair:", error);
+        }
+    }
 
     return (
-        <View style={styles.container}>
-            <LoadingOverlay visible={loading} message="Buscando jogos..." />
-            
-            <FlatList 
-                data={games}
-                keyExtractor={(item) => String(item.id)}
-                renderItem={({ item }) => (
-                    <ListItemComponent 
-                        content={() => renderGameContent(item)}
-                        // Se quiser habilitar edição/exclusão:
-                        // showDeleteButton={true}
-                        // deleteFunction={() => handleDelete(item.id)}
-                    />
-                )}
-                ListEmptyComponent={<Text style={styles.empty}>Nenhum jogo cadastrado</Text>}
-            />
+        <View style={GlobalStyles.container}>
+        <View style={styles.header}>
+            <Text style={GlobalStyles.title}>Bem-vindo, {userName}</Text>
+            <Text style={styles.subtitle}>O que vamos jogar hoje?</Text>
+        </View>
 
-            {/* Botão Flutuante para Adicionar */}
-            <View style={styles.fabContainer}>
-                <IconButtonComponent 
-                    iconName="add" 
-                    size={30} 
-                    color="#fff" 
-                    style={styles.fab}
-                    onPress={() => navigation.navigate("AddGame")}
-                />
-            </View>
+        <View style={styles.menuContainer}>
+            <TouchableOpacity
+            style={[styles.card, { backgroundColor: Colors.surface }]}
+            onPress={() => navigation.navigate("GamesListScreen")}
+            >
+            <Ionicons name="game-controller" size={40} color={Colors.primary} />
+            <Text style={styles.cardText}>Biblioteca de Jogos</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+            style={[styles.card, { backgroundColor: Colors.surface }]}
+            onPress={() => navigation.navigate("RegisterListScreen")}
+            >
+            <Ionicons name="book" size={40} color={Colors.primary} />
+            <Text style={styles.cardText}>Meus de Registros de Jogos</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                style={[styles.card, { backgroundColor: Colors.surface }]}
+                onPress={() => navigation.navigate("User", {userId: null})}
+            >
+            <Ionicons name="person" size={40} color={Colors.secondary} />
+            <Text style={styles.cardText}>Meu Perfil</Text>
+            </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
+            <Text style={styles.logoutText}>Sair da Conta</Text>
+        </TouchableOpacity>
         </View>
     );
-}
+    }
 
-const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f5f5f5' },
-    itemRow: { flexDirection: 'row', alignItems: 'center' },
-    gameTitle: { fontWeight: 'bold', fontSize: 16 },
-    gameSubtitle: { color: '#666', fontSize: 12 },
-    gameGenre: { color: '#8257E5', fontSize: 12, fontWeight: 'bold' },
-    empty: { textAlign: 'center', marginTop: 50, color: '#999' },
-    fabContainer: { position: 'absolute', bottom: 20, right: 20 },
-    fab: { backgroundColor: '#007bff', borderRadius: 30, width: 60, height: 60, elevation: 5 }
+    const styles = StyleSheet.create({
+    header: { marginBottom: 40, alignItems: 'center' },
+    subtitle: { color: Colors.textSecondary, fontSize: 16 },
+    menuContainer: { flex: 1, justifyContent: 'center' },
+    card: {
+        padding: 20,
+        borderRadius: 12,
+        marginBottom: 20,
+        alignItems: 'center',
+        flexDirection: 'row',
+        elevation: 3
+    },
+    cardText: {
+        color: Colors.text,
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginLeft: 20
+    },
+    logoutButton: {
+        padding: 15,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: Colors.danger,
+        alignItems: 'center'
+    },
+    logoutText: { color: Colors.danger, fontWeight: 'bold' }
 });

@@ -1,32 +1,15 @@
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
+import { GlobalStyles } from "../Styles/Theme";
 
-export default function ButtonComponent({ pressFunction, label }) {
+export default function ButtonComponent({ pressFunction, label, danger = false }) {
   return (
-    <View style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={pressFunction}>
-        {
-          label &&
-            <Text style={styles.label}>{label}</Text>
-        }
+    <View style={{ alignItems: 'center' }}>
+      <TouchableOpacity
+        style={[GlobalStyles.button, danger ? GlobalStyles.buttonDanger : null]}
+        onPress={pressFunction}
+      >
+        {label && <Text style={GlobalStyles.buttonText}>{label}</Text>}
       </TouchableOpacity>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: "center",
-  },
-  button: {
-    backgroundColor: "#007bff",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  label: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});

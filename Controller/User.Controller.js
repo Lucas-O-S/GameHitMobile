@@ -1,11 +1,17 @@
 import { UserService } from "../Service/User.Service";
+import UserModel from "../Models/UserModel";
 
 export default class UserController {
 
     static async login(email, password) {
         try {
-            const result = await UserService.login(email, password);
-            return result;
+            const user = new UserModel({
+            email: email,
+            password: password
+        });
+        
+        console.log("Emailaaaa: " + user.email);
+        return await UserService.login(user);
         } catch (error) {
             console.log("Erro ao fazer login:", error.message);
             throw new Error(error.message);

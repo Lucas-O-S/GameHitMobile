@@ -1,24 +1,27 @@
 import React, { useState, useContext } from "react";
 import { View, TouchableOpacity, Text, Alert } from "react-native";
-import UserController from "../Controller/User.Controller";
 import InputTextComponent from "../Components/InputTextComponent";
 import ButtonComponent from "../Components/ButtonComponent";
 import LoadingOverlay from "../Components/LoadingOverlay";
-import { AuthContext } from "../utils/AuthContext";
 import { GlobalStyles, Colors } from "../Styles/Theme";
+import UserController from "../Controller/User.Controller";
 
 export default function LoginScreen({ navigation }) {
-    const { signIn } = useContext(AuthContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
     async function handleLogin() {
         if (!email || !password) return Alert.alert("Atenção", "Preencha tudo");
-        
+
         setLoading(true);
         try {
             await UserController.login(email, password);
+
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'Home' }],
+            });
         } catch (error) {
             Alert.alert("Erro", error.message);
         } finally {
@@ -33,14 +36,19 @@ export default function LoginScreen({ navigation }) {
             <Text style={GlobalStyles.title}>GameHit</Text>
             
             <InputTextComponent 
-                label="Email" value={email} onChangeText={setEmail} 
-                keyboardType="email-address" 
-                style={{ backgroundColor: Colors.surface, color: Colors.text }}
+                label="Email"
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                placeholder="email@exemplo.com"
             />
             
             <InputTextComponent 
-                label="Senha" value={password} onChangeText={setPassword} 
-                secureTextEntry 
+                label="Senha"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+                placeholder="******"
             />
 
             <View style={{ marginTop: 20 }}>

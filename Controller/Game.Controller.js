@@ -10,6 +10,14 @@ export default class GameController {
             throw new Error(error.message);
         }
     }
+    static async findOneGame(id) {
+        try {
+            return await GameService.findOne(id);
+        } catch (error) {
+            console.log("Erro no controller:", error.message);
+            throw new Error(error.message);
+        }
+    }
 
     static async createGame(gameModel, imageUri) {
         try {

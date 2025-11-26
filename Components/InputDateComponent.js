@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
+import { GlobalStyles } from '../Styles/Theme';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { convertDateToString } from '../utils/DateConverter';
 
@@ -10,7 +11,7 @@ export default function InputDateComponent({
   onChangeText, 
   placeholder, 
   style,
-  tipo = "spinner" //Spinner ou Calendar
+  tipo = "Calendar" //Spinner ou Calendar
 }) {
 
     const [showPicker, setShowPicker] = useState(false);
@@ -23,22 +24,22 @@ export default function InputDateComponent({
     }
 
 
-    return (
-        <View style={[styles.container, style]}>
-            
-            {label && <Text style={styles.label}>{label}</Text>}
-           
-            <TouchableOpacity onPress={() => setShowPicker(true)}>
-                <TextInput
-                    style={[styles.input]}
-                    value={value}
-                    onChangeText={onChangeText}
-                    placeholder={placeholder}
-                    placeholderTextColor="#999"
-                    editable={false}
-                />
+  return (
+    <View style={[styles.container, style]}>
 
-            </TouchableOpacity>
+      {label && <Text style={GlobalStyles.label}>{label}</Text>}
+
+      <TouchableOpacity onPress={() => setShowPicker(true)}>
+        <TextInput
+          style={[GlobalStyles.input]}
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          placeholderTextColor="#999"
+          editable={false}
+        />
+
+      </TouchableOpacity>
 
             <DateTimePickerModal
                 isVisible={showPicker}

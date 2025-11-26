@@ -8,13 +8,13 @@ export default class GameModel extends StandardModel {
     #cover;
     #genre;
 
-    constructor({ id = null, name = "", firstReleaseDate = "", genreId = null, cover = null, genre = new GenreModel()}) {
+    constructor({ id = null, name = "", firstReleaseDate = "", genreId = null, cover = null, genre = null}) {
         super(id);
         this.#name = name;
         this.#firstReleaseDate = firstReleaseDate;
         this.#genreId = genreId;
         this.#cover = cover;
-        this.#genre = genre;
+        this.#genre = new GenreModel(genre) ?? null;
     }
 
     get name() { return this.#name; }
