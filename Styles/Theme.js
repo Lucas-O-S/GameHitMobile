@@ -36,4 +36,55 @@ export const Colors = {
         borderWidth: 1,
         borderRadius: 6
     }
+    ,
+    // Modal / CustomAlert styles
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    modalBox: {
+        width: '100%',
+        backgroundColor: Colors.surface,
+        borderRadius: 12,
+        padding: 20,
+        elevation: 4,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 4,
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: Colors.text,
+        marginBottom: 8,
+    },
+    modalMessage: {
+        color: Colors.textSecondary,
+        marginBottom: 16,
+    },
+    modalButtons: {
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+    },
+    modalButton: {
+        paddingVertical: 10,
+        paddingHorizontal: 14,
+        borderRadius: 8,
+        marginLeft: 8,
+    },
+    modalCancel: {
+        backgroundColor: Colors.surface,
+        borderWidth: 1,
+        borderColor: Colors.border,
+    },
+    modalConfirm: {
+        backgroundColor: Colors.danger,
+    },
+    modalButtonText: {
+        color: Colors.text,
+        fontWeight: 'bold',
+    }
 });

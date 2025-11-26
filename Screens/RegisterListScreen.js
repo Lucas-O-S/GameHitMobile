@@ -45,8 +45,10 @@ export default function RegisterListScreen({ navigation }) {
       setUserId(id);
 
       const data = await RegisterController.findAllByUser(id);
-      console.log("resposta: ", data);
-      setRegisters(Array.isArray(data) ? data : []);
+
+      console.log("🔍 LISTA RECEBIDA DO BACKEND:", JSON.stringify(data, null, 2));
+
+      setRegisters(data);
 
     } catch (error) {
       console.log(error);
@@ -85,9 +87,10 @@ export default function RegisterListScreen({ navigation }) {
         renderItem={({ item }) => (
           <ListItemComponent
             content={() => (
+                
               <View>
                 <Text style={{ fontWeight: 'bold', fontSize: 16 }}>
-                  {item.game.name}
+                  {item.gameStatus.name}
                 </Text>
 
                 <Text style={{ color: '#555' }}>

@@ -3,6 +3,8 @@ import { authHeader, jsonHeader, multipartHeader } from "../utils/HeaderHelper";
 import { registerWrapper } from "../Wrappers/RegisterWrapper";
 import RegisterModel from "../Models/RegisterModel";
 import { convertStandardDateToDmy } from "../utils/DateConverter";
+import GameStatusModel from "../Models/GameStatus.model";
+import GameModel from "../Models/GameModel";
 
 export class RegisterService {
 
@@ -71,13 +73,17 @@ export class RegisterService {
         const result = await ExecuteHttpRequest.callout({
             url: "/Register/findByUser/" + userId,
             method: "GET",
-            headers: headers
+            headers: headers,
+            param: {BuscaImagem : true}
         });
 
         let registerList = [];
 
+
         if (result.data && result.data.data) {
+
             result.data.data.forEach((dataUnit) => {
+                console.log("game id:", dataUnit.game.id);
                 registerList.push(new RegisterModel({
                     id: dataUnit.id,
                     review: dataUnit.review,
@@ -85,8 +91,8 @@ export class RegisterService {
                     completedDate: convertStandardDateToDmy(dataUnit.completedDate),
                     personalRating: dataUnit.personalRating,
                     userId: dataUnit.userId,
-                    game: dataUnit.game,
-                    gameStatus: dataUnit.gameStatus,
+                    game: new GameModel(dataUnit.game),
+                    gameStatus: new GameStatusModel (dataUnit.gameStatus),
                 }));
             });
         }
@@ -112,7 +118,7 @@ export class RegisterService {
         let registerList = [];
 
         if (result.data && result.data.data) {
-            result.data.data.forEach((dataUnit) => {
+            result.data.dataUnit.forEach((dataUnit) => {
                 registerList.push(new RegisterModel({
                     id: dataUnit.id,
                     review: dataUnit.review,
