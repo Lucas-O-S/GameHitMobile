@@ -47,19 +47,19 @@ export default function HomeScreen({ navigation }) {
             </TouchableOpacity>
 
             <TouchableOpacity
+            style={[styles.card, { backgroundColor: Colors.surface }]}
+            onPress={() => navigation.navigate("RegisterListScreen")}
+            >
+            <Ionicons name="book" size={40} color={Colors.primary} />
+            <Text style={styles.cardText}>Meus de Registros de Jogos</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
                 style={[styles.card, { backgroundColor: Colors.surface }]}
                 onPress={() => navigation.navigate("User", {userId: null})}
             >
             <Ionicons name="person" size={40} color={Colors.secondary} />
             <Text style={styles.cardText}>Meu Perfil</Text>
-            </TouchableOpacity>
-           
-            <TouchableOpacity
-            style={[styles.card, { backgroundColor: Colors.surface }]}
-            onPress={() => navigation.navigate("RegisterListScreen")}
-            >
-            <Ionicons name="game-controller" size={40} color={Colors.primary} />
-            <Text style={styles.cardText}>Meus de Registros de Jogos</Text>
             </TouchableOpacity>
         </View>
 

@@ -102,7 +102,7 @@ export default function RegisterListScreen({ navigation }) {
             showEditButton={true}
             showDeleteButton={true}
             editButtonLabel={"Editar"}
-            editFunction={() => navigation.navigate("EditGameRegister", { register: item })}
+            editFunction={() => navigation.navigate("UpdateGameRegisterScreen", { register: item })}
             deleteButtonLabel={"Excluir"}
             useInternalConfirmation={false}
             deleteFunction={() => { setSelectedDeleteId(item.id); setDeleteModalVisible(true); }}

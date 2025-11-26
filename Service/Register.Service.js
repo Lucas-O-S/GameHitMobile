@@ -5,6 +5,7 @@ import RegisterModel from "../Models/RegisterModel";
 import { convertStandardDateToDmy } from "../utils/DateConverter";
 import GameStatusModel from "../Models/GameStatus.model";
 import GameModel from "../Models/GameModel";
+import ImageHelper from "../utils/ImageHelper";
 
 export class RegisterService {
 

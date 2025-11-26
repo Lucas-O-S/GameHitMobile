@@ -16,6 +16,7 @@ import GameDetailScreen from './Screens/GameDetailScreen';
 import GamesListScreen from './Screens/GamesListScreen';
 import GameRegisterScreen from './Screens/GameRegisterScreen';
 import RegisterListScreen from './Screens/RegisterListScreen';
+import UpdateGameRegisterScreen from './Screens/UpdateGameRegisterScreen';
 
 import { AuthHelper } from './utils/AuthHelper';
 
@@ -55,6 +56,7 @@ export default function App() {
           <Stack.Screen name="GamesListScreen" component={GamesListScreen} />
           <Stack.Screen name="GameRegisterScreen" component={GameRegisterScreen} />
           <Stack.Screen name="RegisterListScreen" component={RegisterListScreen} />
+          <Stack.Screen name="UpdateGameRegisterScreen" component={UpdateGameRegisterScreen} />
         </Stack.Navigator>
       <StatusBar style="auto" />
     </NavigationContainer>

@@ -19,9 +19,10 @@ import GameStatusModel from "../Models/GameStatus.model";
 
 export default function GameRegisterScreen({ route, navigation }) {
 
-    const { game } = route.params;
+    const { register } = route.params;
 
     const [userId, setUserId] = useState(null);
+    const [game, setGame] = useState(null);
     const [gameStatusId, setGameStatusId] = useState(null);
     const [gameStatusList, setGameStatusList] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -49,9 +50,14 @@ export default function GameRegisterScreen({ route, navigation }) {
 
             const result = await GameStatusController.findAll();
 
-            setGameStatusList(result);
+            setReview(register.review);
+            setStartedDate(register.startedDate);
+            setCompletedDate(register.completedDate);
+            setPersonalRating(register.personalRating);
+            setGame(register.game);
+            setGameStatusId(register.gameStatus.id);
 
-            console.log("Status de jogo: ", JSON.stringify(result[0].name));
+            setGameStatusList(result);
 
         } catch {
             Alert.alert("Erro", "Falha ao carregar dados.");
@@ -81,9 +87,9 @@ export default function GameRegisterScreen({ route, navigation }) {
                     review: review
                 });
     
-                await RegisterController.create(newRegister);
+                await RegisterController.update(newRegister);
     
-                Alert.alert("Sucesso!", "Registro criado.");
+                Alert.alert("Sucesso!", "Registro atualizado.");
                 navigation.goBack();
     
             } catch (error) {
